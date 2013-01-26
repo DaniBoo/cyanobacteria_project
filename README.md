@@ -18,12 +18,12 @@ Decided to use Rspec on recommendation.
 
 Wrote a basic spec and Ruby classses called:
 
-- CodemlResults
-- CreateControlFile
+    CodemlResults
+    CreateControlFile
 
 Wrote 1 method on CreateControlFile:
 
-- read()
+    read()
 
 Wrote first unit tests to check if the file:
 
@@ -50,46 +50,46 @@ Have been recommended to look at using Heroku. This makes it easy to run Ruby ap
 
     ruby -e "$(curl -fsSkL raw.github.com/mxcl/homebrew/go)"
 
-  2.1. Ran:
+2.1. Ran:
 
-     brew doctor
+    brew doctor
 
-    2.1.1. Told me that Command Line Developer Tools needed installing and Git needed updating
+2.1.1. Told me that Command Line Developer Tools needed installing and Git needed updating
 
-  2.2. Installed Apple Command Line Developer Tools using instructions here:
-    http://www.moncefbelyamani.com/how-to-install-xcode-homebrew-git-rvm-ruby-on-mac/
+2.2. Installed Apple Command Line Developer Tools using instructions here:
+  http://www.moncefbelyamani.com/how-to-install-xcode-homebrew-git-rvm-ruby-on-mac/
 
-  2.3. Ran:
+2.3. Ran:
 
-     brew install git
+   brew install git
 
-  2.4. Ran:
+2.4. Ran:
 
-     brew doctor again
+   brew doctor again
 
-    2.4.1. Told me that there was a missing git remote origin and that "/usr/bin occurs before /usr/local/bin"
+2.4.1. Told me that there was a missing git remote origin and that "/usr/bin occurs before /usr/local/bin"
 
-  2.5. Opened:
+2.5. Opened:
 
-      /etc/paths/
+    /etc/paths/
 
-  Using:
+Using:
 
-     sudo vim /etc/paths
+   sudo vim /etc/paths
 
-  Moved the following lines to the top of the file:
+Moved the following lines to the top of the file:
 
-     /usr/local/bin
-     /usr/local/sbin
+    /usr/local/bin
+    /usr/local/sbin
 
-  Saved the file.
+Saved the file.
 
-  2.6. As per Homebrew instructions ran:
+2.6. As per Homebrew instructions ran:
 
     cd /usr/local
     git add remote origin https://github.com/mxcl/homebrew.git
 
-  Didn't work. Got "fatal: Not a git repository (or any of the parent directories): .git". Decided to leave this and come back to it.
+Didn't work. Got "fatal: Not a git repository (or any of the parent directories): .git". Decided to leave this and come back to it.
 
 3. Updating Ruby from 1.8.7 to 1.9.3 using RVM
 
@@ -107,7 +107,7 @@ Ran:
 
 Result is:
 
-ruby 1.9.3p374 (2013-01-15 revision 38858) [x86_64-darwin12.2.1]
+    ruby 1.9.3p374 (2013-01-15 revision 38858) [x86_64-darwin12.2.1]
 
 4. Tried installing bundler (to manage gems)
 
@@ -160,13 +160,13 @@ This worked and returned 2 passing tests.
 
 Following: https://devcenter.heroku.com/articles/ruby
 
-  8.1. Installed Heroku Toolbelt for OS X (https://toolbelt.heroku.com)
+8.1. Installed Heroku Toolbelt for OS X (https://toolbelt.heroku.com)
 
-    To do:
+To do:
 
-    - Set up Heroku account
-    - Run: heroku create
-    - Etc.
+- Set up Heroku account
+- Run: heroku create
+- Etc.
 
 9. Set up an alias for cyanobacteria_project as it was getting to be a pain to type!
 
