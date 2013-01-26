@@ -175,3 +175,25 @@ Ran:
     ln -s cyanobacteria_project cyan
 
 Now I can just open up a new terminal window and type: cd cyan
+
+
+
+OK .. setup stuff over.
+
+Starting to work on extracting the tree and lnL from the raw output.
+
+Using:
+
+http://rubular.com
+
+to help with testing regexes.
+
+
+#### 5.30pm
+Success!!
+
+Got a few values pulling out of the MLC file with regexes and into readable attributes on the class.
+
+Now need to tidy up the code a bit.
+
+The name / path of the file is hard coded at the moment, which needs to be improved.

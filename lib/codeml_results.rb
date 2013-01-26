@@ -2,6 +2,10 @@ class CodemlResults
 
   attr_reader :raw_output, :tree_length, :lnL
 
+  def initialize(filename)
+    @filename = filename
+  end
+
   # Reads in a file
   def read(filename)
     buffer = File.read filename if File.exist? filename
@@ -9,7 +13,7 @@ class CodemlResults
 
   # Gives the raw output of the results
   def raw_output
-    self.read('codeml_files/mlc')
+    self.read(@filename)
   end
 
   # Extracts the tree
@@ -22,13 +26,15 @@ class CodemlResults
   # Extracts the lnL
   def lnL()
     # find the lnL in the raw output using a regex
-    # works on the assumption it's the only negative number in the file
-    raw_output[/-(\d+)*.(\d+)/]
+    # works on the assumption it's the only one of 2 negative numbers in the file
+    # and the only one that occurs after a colon (:)
+    # Note: Might be a better way to do this. It seems a bit brittle.
+    raw_output[/:[\s]+-(\d+)*.(\d+)/][/-(\d+).(\d+)/]
   end
 
 end
 
-my_results = CodemlResults.new
+my_results = CodemlResults.new('codeml_files/mlc.clock')
 
 puts "Tree length:"
 puts my_results.tree_length
