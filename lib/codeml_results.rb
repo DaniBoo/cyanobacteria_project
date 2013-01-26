@@ -18,10 +18,10 @@ class CodemlResults
 
   # Extracts the tree
 
-  def tree_length
-    # find the tree length in the raw output using a regex
-    raw_output[/tree[\s]+length[\s]+=[\s]+(\d+).(\d+)/][/(\d+).(\d+)/]
-  end
+  # def tree_length
+  #   # find the tree length in the raw output using a regex
+  #   raw_output[/tree[\s]+length[\s]+=[\s]+(\d+).(\d+)/][/(\d+).(\d+)/]
+  # end
 
   # Extracts the lnL
   def lnL
@@ -34,9 +34,9 @@ class CodemlResults
 
 end
 
+# Create a new CodemlResults object, based on a specified output file
 my_results = CodemlResults.new('codeml_files/mlc.clock')
 
-puts "Tree length:"
-puts my_results.tree_length
+# Access the attributes as follows
 puts "\nlnL:"
 puts my_results.lnL

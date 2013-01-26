@@ -1,4 +1,5 @@
 require "erb"
+require "fileutils"
 
 class ControlFile
 
@@ -9,6 +10,20 @@ class ControlFile
     buffer = File.read filename if File.exist? filename
   end
 
+  def create_file(path, contents)
+    dir = File.dirname(path)
+
+    unless File.directory?(dir)
+      FileUtils.mkdir_p(dir)
+    end
+
+    myfile = File.new(path, 'w+')
+    myfile.print(contents)
+    myfile.close
+
+    "#{path} created."
+  end
+
   # creates a new control file
   def create(filename)
     template = 'templates/codeml.ctl.template'
@@ -16,7 +31,10 @@ class ControlFile
 
     # Using ERB templates
     output = ERB.new(input)
-    output.result(binding)
+    output = output.result(binding)
+
+    # Create a blank file
+    self.create_file("codeml_files/#{filename}", output)
 
   end
 
@@ -29,4 +47,5 @@ my_control_file = ControlFile.new
 my_control_file.model = 0
 my_control_file.aaRatefile = 'dayhoff.dat'
 
-puts my_control_file.create('')
+#Create the control file
+puts my_control_file.create('codeml.ctl')
