@@ -24,11 +24,11 @@ class CodemlResults
   end
 
   # Extracts the lnL
-  def lnL()
+  def lnL
     # find the lnL in the raw output using a regex
     # works on the assumption it's the only one of 2 negative numbers in the file
     # and the only one that occurs after a colon (:)
-    # Note: Might be a better way to do this. It seems a bit brittle.
+    # Note: Might be a better way to do this. It seems a bit brittle but will work with the current version of PAML.
     raw_output[/:[\s]+-(\d+)*.(\d+)/][/-(\d+).(\d+)/]
   end
 
