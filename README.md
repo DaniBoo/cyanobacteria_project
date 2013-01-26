@@ -167,3 +167,11 @@ Following: https://devcenter.heroku.com/articles/ruby
     - Set up Heroku account
     - Run: heroku create
     - Etc.
+
+9. Set up an alias for cyanobacteria_project as it was getting to be a pain to type!
+
+Ran:
+
+    ln -s cyanobacteria_project cyan
+
+Now I can just open up a new terminal window and type: cd cyan
