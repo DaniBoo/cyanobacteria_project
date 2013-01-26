@@ -31,6 +31,7 @@ Have been recommended to look at using Heroku. This makes it easy to run Ruby ap
 Following instructions here:
 http://www.shanison.com/2011/02/20/how-to-install-rvm-on-mac/
 
-To do:
-Install Bundler
-Create a Gemfile for package (gem) dependencies.
+#### To do:
+
+- Install Bundler
+- Create a Gemfile for package (gem) dependencies.
