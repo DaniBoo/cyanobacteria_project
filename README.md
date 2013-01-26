@@ -1,7 +1,7 @@
 cyanobacteria_project
 =====================
 
-Ruby code for University of St. Andrews Biology honours project.
+Ruby code for University of St) Andrews Biology honours project.
 
 By Danielle Boobyer.
 
@@ -36,7 +36,7 @@ Done for the day.
 
 
 ### 26/01/2013
-Working on new computer (Macbook Air). So will need to set up everything from scratch. This should help with portability of app as it's a good opportunity to have this all documented.
+Working on new computer (Macbook Air) So will need to set up everything from scratch. This should help with portability of app as it's a good opportunity to have this all documented.
 
 Am using Submlime Text 2 for text editing and ghe Github mac client for version control.
 
@@ -44,32 +44,32 @@ Going to look at using Bundler and a Gemfile in order to manage dependencies on 
 
 Have been recommended to look at using Heroku. This makes it easy to run Ruby applications in the cloud (Ubuntu VM running on Amazon Web Services) and is low-cost / free.
 
-1. Added CodeML binary manually in the /bin directory of the application.
+1) Added CodeML binary manually in the /bin directory of the application.
 
-2. Installed Homebrew (a Mac Package Manager) using:
+2) Installed Homebrew (a Mac Package Manager) using:
 
     ruby -e "$(curl -fsSkL raw.github.com/mxcl/homebrew/go)"
 
-2.1. Ran:
+2.1) Ran:
 
     brew doctor
 
-2.1.1. Told me that Command Line Developer Tools needed installing and Git needed updating
+2.1.1) Told me that Command Line Developer Tools needed installing and Git needed updating
 
-2.2. Installed Apple Command Line Developer Tools using instructions here:
+2.2) Installed Apple Command Line Developer Tools using instructions here:
   http://www.moncefbelyamani.com/how-to-install-xcode-homebrew-git-rvm-ruby-on-mac/
 
-2.3. Ran:
+2.3) Ran:
 
    brew install git
 
-2.4. Ran:
+2.4) Ran:
 
    brew doctor again
 
-2.4.1. Told me that there was a missing git remote origin and that "/usr/bin occurs before /usr/local/bin"
+2.4.1) Told me that there was a missing git remote origin and that "/usr/bin occurs before /usr/local/bin"
 
-2.5. Opened:
+2.5) Opened:
 
     /etc/paths/
 
@@ -84,14 +84,14 @@ Moved the following lines to the top of the file:
 
 Saved the file.
 
-2.6. As per Homebrew instructions ran:
+2.6) As per Homebrew instructions ran:
 
     cd /usr/local
     git add remote origin https://github.com/mxcl/homebrew.git
 
 Didn't work. Got "fatal: Not a git repository (or any of the parent directories): .git". Decided to leave this and come back to it.
 
-3. Updating Ruby from 1.8.7 to 1.9.3 using RVM
+3) Updating Ruby from 1.8.7 to 1.9.3 using RVM
 
 Ran:
 
@@ -109,7 +109,7 @@ Result is:
 
     ruby 1.9.3p374 (2013-01-15 revision 38858) [x86_64-darwin12.2.1]
 
-4. Tried installing bundler (to manage gems)
+4) Tried installing bundler (to manage gems)
 
 Ran:
 
@@ -138,9 +138,9 @@ UPDATE (SAME DAY): Fixed this by running:
     sudo chown dani ruby-1.9.3-p374
     chmod 755 ruby-1.9.3-p374
 
-5. Created Gemfile in root of applicaiton. This will allow me to manage dependencies )eg. gems I install)
+5) Created Gemfile in root of applicaiton. This will allow me to manage dependencies (eg. gems I install)
 
-6. Specified version of Ruby to use in Gemfile and added Rspec for unit testing.
+6) Specified version of Ruby to use in Gemfile and added Rspec for unit testing.
 
 Ran:
 
@@ -154,13 +154,13 @@ Ran:
 
 This worked and returned 2 passing tests.
 
-7. Installed the Mac client for Github (from http://mac.github.com)
+7) Installed the Mac client for Github (from http://mac.github.com)
 
-8. Installed Heroku.
+8) Installed Heroku.
 
 Following: https://devcenter.heroku.com/articles/ruby
 
-8.1. Installed Heroku Toolbelt for OS X (https://toolbelt.heroku.com)
+8.1) Installed Heroku Toolbelt for OS X (https://toolbelt.heroku.com)
 
 To do:
 
@@ -168,7 +168,7 @@ To do:
 - Run: heroku create
 - Etc.
 
-9. Set up an alias for cyanobacteria_project as it was getting to be a pain to type!
+9) Set up an alias for cyanobacteria_project as it was getting to be a pain to type!
 
 Ran:
 
