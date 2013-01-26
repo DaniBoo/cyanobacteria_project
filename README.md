@@ -160,7 +160,7 @@ This worked and returned 2 passing tests.
 
 Following: https://devcenter.heroku.com/articles/ruby
 
-    8.1. Installed Heroku Toolbelt for OS X (https://toolbelt.heroku.com)
+  8.1. Installed Heroku Toolbelt for OS X (https://toolbelt.heroku.com)
 
     To do:
 
