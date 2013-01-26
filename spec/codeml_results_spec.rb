@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe CodemlResults do
 
-  let(:results) {CodemlResults.new}
+  let(:results) {CodemlResults.new('codeml_files/mlc.clock')}
   
   # The tests for the read() method
   context "read() a file" do

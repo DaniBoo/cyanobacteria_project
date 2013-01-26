@@ -197,3 +197,15 @@ Got a few values pulling out of the MLC file with regexes and into readable attr
 Now need to tidy up the code a bit.
 
 Fixed: ~~The name / path of the file is hard coded at the moment, which needs to be improved.~~
+
+
+#### 6.30pm
+Even more success!!
+
+Set up the program to use ERB templates and read in from a template file
+
+Have got this working now and storing the updated value in memory.
+
+Now just need to get it to save out the control file.
+
+
