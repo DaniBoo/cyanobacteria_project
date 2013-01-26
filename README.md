@@ -196,4 +196,4 @@ Got a few values pulling out of the MLC file with regexes and into readable attr
 
 Now need to tidy up the code a bit.
 
-The name / path of the file is hard coded at the moment, which needs to be improved.
+Fixed: ~~The name / path of the file is hard coded at the moment, which needs to be improved.~~
