@@ -26,7 +26,7 @@ class ControlFile
 
   # creates a new control file
   def create(filename)
-    template = 'templates/codeml.ctl.template'
+    template = 'templates/codeml.ctl.erb'
     input = self.read(template)
 
     # Using ERB templates
