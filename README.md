@@ -25,9 +25,9 @@ Going to look at using Bundler and a Gemfile in order to manage dependencies on 
 
 Have been recommended to look at using Heroku. This makes it easy to run Ruby applications in the cloud (Ubuntu VM running on Amazon Web Services) and is low-cost / free.
 
-1) Added CodeML binary manually in the /bin directory.
+1. Added CodeML binary manually in the /bin directory.
 
-2) Installed RVM to upgrade to Ruby 1.9.3 and manage Ruby versions.
+2. Installed RVM to upgrade to Ruby 1.9.3 and manage Ruby versions.
 Following instructions here:
 http://www.shanison.com/2011/02/20/how-to-install-rvm-on-mac/
 
