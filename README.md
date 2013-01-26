@@ -130,8 +130,13 @@ Ran:
     chmod 777 ruby-1.9.3-p374
     gem install bundler
 
-This worked. But I do get a warning that the directory is insecure. That's OK as it's jusy my laptop.
+This worked. But I do get a warning that the directory is insecure. That's OK as it's jusy my laptop.  But if I was to do it again it'd be good to get this sorted properly.
 
+UPDATE (SAME DAY): Fixed this by running:
+
+    cd /Users/dani/.rvm/gems/
+    sudo chown dani ruby-1.9.3-p374
+    chmod 755 ruby-1.9.3-p374
 
 5. Created Gemfile in root of applicaiton. This will allow me to manage dependencies )eg. gems I install)
 
@@ -150,3 +155,15 @@ Ran:
 This worked and returned 2 passing tests.
 
 7. Installed the Mac client for Github (from http://mac.github.com)
+
+8. Installed Heroku.
+
+Following: https://devcenter.heroku.com/articles/ruby
+
+    8.1. Installed Heroku Toolbelt for OS X (https://toolbelt.heroku.com)
+
+    To do:
+
+    - Set up Heroku account
+    - Run: heroku create
+    - Etc.
