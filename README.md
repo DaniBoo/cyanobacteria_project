@@ -99,7 +99,7 @@ Ran:
 
 Ran:
 
-    rvm use 1.9.3
+    rvm --default use 1.9.3
 
 Ran:
 
@@ -109,7 +109,28 @@ Result is:
 
 ruby 1.9.3p374 (2013-01-15 revision 38858) [x86_64-darwin12.2.1]
 
+4. Tried installing bundler (to manage gems)
 
+Ran:
+
+    gem install bundler
+
+Failed - got:
+
+    ERROR:  While executing gem ... (Gem::FilePermissionError)
+    You don't have write permissions into the /Users/dani/.rvm/gems/ruby-1.9.3-p374 directory.
+
+Note: This may be as a result of using sudo to install gems. Not sure.
+
+Updated permissions on the /Users/dani/.rvm/gems/ruby-1.9.3-p374 directory
+
+Ran:
+
+    cd /Users/dani/.rvm/gems/
+    chmod 777 ruby-1.9.3-p374
+    gem install bundler
+
+This worked. But I do get a warning that the directory is insecure. That's OK as it's jusy my laptop.
 
 
 2. Installed RVM to upgrade to Ruby 1.9.3 and manage Ruby versions.
