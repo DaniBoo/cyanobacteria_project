@@ -52,7 +52,7 @@ Have been recommended to look at using Heroku. This makes it easy to run Ruby ap
 
   2.1. Ran:
 
-    brew doctor
+     brew doctor
 
     2.1.1. Told me that Command Line Developer Tools needed installing and Git needed updating
 
@@ -61,26 +61,26 @@ Have been recommended to look at using Heroku. This makes it easy to run Ruby ap
 
   2.3. Ran:
 
-    brew install git
+     brew install git
 
   2.4. Ran:
 
-    brew doctor again
+     brew doctor again
 
     2.4.1. Told me that there was a missing git remote origin and that "/usr/bin occurs before /usr/local/bin"
 
   2.5. Opened:
 
-    /etc/paths/
+      /etc/paths/
 
   Using:
 
-    sudo vim /etc/paths
+     sudo vim /etc/paths
 
   Moved the following lines to the top of the file:
 
-    /usr/local/bin
-    /usr/local/sbin
+     /usr/local/bin
+     /usr/local/sbin
 
   Saved the file.
 
