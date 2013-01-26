@@ -133,11 +133,20 @@ Ran:
 This worked. But I do get a warning that the directory is insecure. That's OK as it's jusy my laptop.
 
 
-2. Installed RVM to upgrade to Ruby 1.9.3 and manage Ruby versions.
-Following instructions here:
-http://www.shanison.com/2011/02/20/how-to-install-rvm-on-mac/
+5. Created Gemfile in root of applicaiton. This will allow me to manage dependencies )eg. gems I install)
 
-#### To do:
+6. Specified version of Ruby to use in Gemfile and added Rspec for unit testing.
 
-- Install Bundler
-- Create a Gemfile for package (gem) dependencies.
+Ran:
+
+    bundle install
+
+This worked.
+
+Ran:
+
+    rspec
+
+This worked and returned 2 passing tests.
+
+7. Installed the Mac client for Github (from http://mac.github.com)
