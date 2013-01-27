@@ -37,13 +37,3 @@ class CodemlResults
 
 end
 
-# Create a new CodemlResults object, based on a specified output file
-my_results = CodemlResults.new('codeml_files/mlc.clock')
-
-# Access the attributes as follows
-puts "np:"
-puts my_results.np
-puts "lnL:"
-puts my_results.lnL
-puts "AIC:"
-puts my_results.AIC
