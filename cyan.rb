@@ -9,11 +9,15 @@ require "optparse"
 # Used technique here - http://stackoverflow.com/questions/4244611/pass-variables-to-ruby-script-via-command-line
 options = {}
 OptionParser.new do |opts|
-  opts.banner = "Usage: example.rb [options]"
+  opts.banner = "Usage: cyan.rb [options]"
 
-  opts.on('-g', '--generate NAME',  'Generate codeml control file') { |v| options[:generate] = v }
+  opts.on('-g', '--generate [NAME]',  'Generate codeml control file') { |v| options[:generate] = v; options[:g] = true }
   opts.on('-p', '--parse NAME',     'Parse codeml results file')    { |v| options[:parse] = v }
   opts.on('-d', '--directory NAME', 'Set directory name')           { |v| options[:directory] = v }
+
+  opts.on( '-h', '--help', 'Display this screen' ) do
+    puts opts
+  end
 
 end.parse!
 
@@ -23,8 +27,8 @@ options[:directory] ? directory = options[:directory] : directory = "codeml_file
 
 
 # Generate the control file
-if options[:generate]
-
+if options[:g]
+  puts options[:generate]
 end
 
 
