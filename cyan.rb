@@ -12,8 +12,8 @@ OptionParser.new do |opts|
   opts.banner = "Usage: cyan.rb [options]"
 
   opts.on('-g', '--generate [NAME]',  'Generate codeml control file') { |v| options[:generate] = v; options[:g] = true }
-  opts.on('-p', '--parse NAME',     'Parse codeml results file')    { |v| options[:parse] = v }
-  opts.on('-d', '--directory NAME', 'Set directory name')           { |v| options[:directory] = v }
+  opts.on('-p', '--parse NAME',     'Parse codeml results file')      { |v| options[:parse] = v }
+  opts.on('-d', '--directory NAME', 'Set directory name')             { |v| options[:directory] = v }
 
   opts.on( '-h', '--help', 'Display this screen' ) do
     puts opts
@@ -31,8 +31,6 @@ options[:generate] ? control_filename = options[:generate] : control_filename = 
 
 # Generate the control file
 if options[:g]
-  puts options[:generate]
-
   # Create a new control file in memory
   my_control_file = ControlFile.new
 
