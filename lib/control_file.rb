@@ -34,7 +34,7 @@ class ControlFile
     output = ERB.new(input).result(binding)
 
     # Create a blank file
-    self.create_file("codeml_files/#{filename}", output)
+    self.create_file("#{filename}", output)
   end
 
 end
