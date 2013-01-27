@@ -19,7 +19,7 @@ class CodemlResults
   # Extracts the np
   def np
     # find the np in the raw output using a regex
-    raw_output[/np:[\s]+(\d+)/][/(\d+)/].to_f
+    raw_output[/np:[\s]*(\d+)/][/(\d+)/].to_i
   end
 
   # Extracts the lnL
@@ -27,7 +27,7 @@ class CodemlResults
     # find the lnL in the raw output using a regex
     # works on the assumption it's the only negative number in the file that occurs after a colon (:)
     # Note: Might be a better way to do this. It seems a bit brittle but will work with the current version of PAML.
-    raw_output[/:[\s]+-(\d+)*.(\d+)/][/-(\d+).(\d+)/].to_f
+    raw_output[/:[\s]*-(\d+)*.(\d+)/][/-(\d+).(\d+)/].to_f
   end
 
   def AIC

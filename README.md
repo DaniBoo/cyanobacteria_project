@@ -215,3 +215,14 @@ The control file is now being written.
 
 Now moving back to Heroku setup.
 
+
+### 27/01/2013
+Created a "cyan.rb" file in the root diretory. This will be the main file we run, and will pull in the classes we've created.
+
+Looking at arguments now. Eg.
+
+http://stackoverflow.com/questions/4244611/pass-variables-to-ruby-script-via-command-line
+
+Using Ruby's inbuilt OptionParser functionality
+
+
