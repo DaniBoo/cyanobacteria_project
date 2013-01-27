@@ -2,7 +2,7 @@
 load "lib/codeml_results.rb"
 load "lib/control_file.rb"
 
-# Require the following Gems
+# Require the following
 require "optparse"
 
 # Pull in options passed from the command line
