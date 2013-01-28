@@ -77,7 +77,7 @@ if options[:parse]
   my_results = CodemlResults.new("#{input_directory}/#{filename}")
 
   # Export data to a CSV file
-  # SEQ NO,CLOCK TYPE,NP,LNL,AIC
+  # Order is: SEQ NO,CLOCK TYPE,NP,LNL,AIC
   output = "#{my_results.sequence},#{my_results.clock_type},#{my_results.np},#{my_results.lnL},#{my_results.AIC}"
   
   # First, let's add the output to its own CSV file
