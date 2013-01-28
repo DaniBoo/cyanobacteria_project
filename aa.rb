@@ -1,6 +1,7 @@
 # Load in the classes we've created
 load "lib/codeml_results.rb"
 load "lib/control_file.rb"
+load "lib/fasta_file.rb"
 
 # Require the following
 require "optparse"
