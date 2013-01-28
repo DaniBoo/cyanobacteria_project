@@ -70,17 +70,24 @@ end
 # Parse the results file
 if options[:parse]
 
-  input_array = []
+  input_hash = {}
 
   if options[:parse] != "any"
-    input_array << options[:parse]
+    filename = options[:parse]
+    input_hash =  {input_directory => filename}
   else
-    
+    # Found technique here: http://stackoverflow.com/questions/6419301/iterate-through-every-jpg-or-jpeg-file-in-directory-and-sub-directory
+    # Get a list of mlc files in any subdirectory of codeml_files/aa_input
+    Dir.glob("codeml_files/aa_input/**/mlc").each do |directory_and_file|
+      # remove last 4 characters (/mlc) from the string http://stackoverflow.com/questions/1392487/remove-the-last-2-characters-from-a-string-in-ruby
+      directory = directory_and_file[0..-5]
+      input_hash[directory] = "mlc"
+    end
   end
 
-  input_array.each do |filename|
+  input_hash.each do |input_directory,filename|
     # Get the filename from the options array (directory is set above)
-    filename = options[:parse]
+    
 
     # Create a new CodemlResults object, based on a specified input file
     my_results = CodemlResults.new("#{input_directory}/#{filename}")
