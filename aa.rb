@@ -70,30 +70,40 @@ end
 # Parse the results file
 if options[:parse]
 
-  # Get the filename from the options array (directory is set above)
-  filename = options[:parse]
+  input_array = []
 
-  # Create a new CodemlResults object, based on a specified input file
-  my_results = CodemlResults.new("#{input_directory}/#{filename}")
+  if options[:parse] != "any"
+    input_array << options[:parse]
+  else
+    
+  end
 
-  # Export data to a CSV file
-  # Order is: SEQ NO,CLOCK TYPE,NP,LNL,AIC
-  output = "#{my_results.sequence},#{my_results.clock_type},#{my_results.np},#{my_results.lnL},#{my_results.AIC}"
-  
-  # First, let's add the output to its own CSV file
-  filename = "#{output_directory}/#{my_results.sequence}.#{my_results.clock_type}.csv"
-  my_results.create_own_results_file(filename,output)
+  input_array.each do |filename|
+    # Get the filename from the options array (directory is set above)
+    filename = options[:parse]
 
-  # Now, let's add the output to the bottom of an "all results" CSV file
-  filename = "#{output_directory}/all_results.csv"
-  my_results.add_to_all_results_file(filename,output)
+    # Create a new CodemlResults object, based on a specified input file
+    my_results = CodemlResults.new("#{input_directory}/#{filename}")
 
-  # Return the np/lnL/AIC to the command line as a hash (so it's useful)
-  output_hash = {
-    :sequence => my_results.sequence,
-    :np => my_results.np,
-    :lnL => my_results.lnL,
-    :AIC => my_results.AIC
-  }
-  print output_hash
+    # Export data to a CSV file
+    # Order is: SEQ NO,CLOCK TYPE,NP,LNL,AIC
+    output = "#{my_results.sequence},#{my_results.clock_type},#{my_results.np},#{my_results.lnL},#{my_results.AIC}"
+    
+    # First, let's add the output to its own CSV file
+    filename = "#{output_directory}/#{my_results.sequence}.#{my_results.clock_type}.csv"
+    my_results.create_own_results_file(filename,output)
+
+    # Now, let's add the output to the bottom of an "all results" CSV file
+    filename = "#{output_directory}/all_results.csv"
+    my_results.add_to_all_results_file(filename,output)
+
+    # Return the np/lnL/AIC to the command line as a hash (so it's useful)
+    output_hash = {
+      :sequence => my_results.sequence,
+      :np => my_results.np,
+      :lnL => my_results.lnL,
+      :AIC => my_results.AIC
+    }
+    print output_hash
+  end
 end
