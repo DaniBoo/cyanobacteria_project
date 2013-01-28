@@ -53,12 +53,16 @@ if options[:g]
   # Set whatever attributes we need to
   # Model - if no F then is 2, if F then is 3
   my_control_file.model = 2
+
   # aaRatefile - depends on first part of model eg LG
   my_control_file.aaRatefile = 'LG.dat'
+
   # Fix_alpha - depends on model 0 unless no I and no G
   my_control_file.fix_alpha = 0
+
   # alpha - if no I, no G then is 0, else is 0.5
   my_control_file.alpha
+
   # alpha - if no I, no G then is 0. If I, no G is 2. If I and G is 5. If G, no I is 4.
   my_control_file.nCatG
 
@@ -73,21 +77,22 @@ if options[:parse]
   input_hash = {}
 
   if options[:parse] != "any"
+    # Get the filename from the options array (directory is set above)
     filename = options[:parse]
     input_hash =  {input_directory => filename}
   else
     # Found technique here: http://stackoverflow.com/questions/6419301/iterate-through-every-jpg-or-jpeg-file-in-directory-and-sub-directory
     # Get a list of mlc files in any subdirectory of codeml_files/aa_input
     Dir.glob("codeml_files/aa_input/**/mlc").each do |directory_and_file|
+
       # remove last 4 characters (/mlc) from the string http://stackoverflow.com/questions/1392487/remove-the-last-2-characters-from-a-string-in-ruby
       directory = directory_and_file[0..-5]
+      
       input_hash[directory] = "mlc"
     end
   end
 
   input_hash.each do |input_directory,filename|
-    # Get the filename from the options array (directory is set above)
-    
 
     # Create a new CodemlResults object, based on a specified input file
     my_results = CodemlResults.new("#{input_directory}/#{filename}")
