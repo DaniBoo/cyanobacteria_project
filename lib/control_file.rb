@@ -1,4 +1,4 @@
-# Require the following Gems
+# Require the following
 require "erb"
 require "fileutils"
 
@@ -33,7 +33,7 @@ class ControlFile
     # Using ERB templates
     output = ERB.new(input).result(binding)
 
-    # Create a blank file
+    # Create a blank file then put the contents of the output in
     self.create_file("#{filename}", output)
   end
 

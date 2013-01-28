@@ -11,9 +11,10 @@ options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: cyan.rb [options]"
 
-  opts.on('-g', '--generate [NAME]',  'Generate codeml control file') { |v| options[:generate] = v; options[:g] = true }
-  opts.on('-p', '--parse NAME',     'Parse codeml results file')      { |v| options[:parse] = v }
-  opts.on('-d', '--directory NAME', 'Set directory name')             { |v| options[:directory] = v }
+  opts.on('-g', '--generate [NAME]',  'Generate codeml control file')   { |v| options[:generate] = v; options[:g] = true }
+  opts.on('-p', '--parse NAME',     'Parse codeml results file')        { |v| options[:parse] = v }
+  opts.on('-i', '--input-directory NAME', 'Set input directory name')   { |v| options[:input_directory] = v }
+  opts.on('-o', '--output-directory NAME', 'Set output directory name') { |v| options[:output_directory] = v }
 
   opts.on( '-h', '--help', 'Display this screen' ) do
     puts opts
@@ -22,8 +23,23 @@ OptionParser.new do |opts|
 end.parse!
 
 # Set detaults
-# Directory
-options[:directory] ? directory = options[:directory] : directory = "codeml_files"
+
+# Input Directory
+if options[:input_directory]
+  input_directory = options[:input_directory]
+elsif options[:parse]
+  input_directory = "codeml_files/mlc_files"
+end
+
+# Output Directory
+if options[:output_directory]
+  output_directory = options[:output_directory]
+elsif options[:g]
+  output_directory = "codeml_files/control_files"
+elsif options[:parse]
+  output_directory = "codeml_files/aa_output"
+end
+
 
 # Control File
 options[:generate] ? control_filename = options[:generate] : control_filename = "codeml.ctl"
@@ -47,21 +63,34 @@ if options[:g]
   my_control_file.nCatG
 
   #Create the control file
-  puts my_control_file.create("#{directory}/#{control_filename}")
+  puts my_control_file.create("#{output_directory}/#{control_filename}")
 end
 
 
 # Parse the results file
 if options[:parse]
+
   # Get the filename from the options array (directory is set above)
   filename = options[:parse]
 
-  # Create a new CodemlResults object, based on a specified output file
-  my_results = CodemlResults.new("#{directory}/#{filename}")
+  # Create a new CodemlResults object, based on a specified input file
+  my_results = CodemlResults.new("#{input_directory}/#{filename}")
 
-  # TO DO: We'll need to export the data to some kind of file
+  # Export data to a CSV file
+  # SEQ NO,CLOCK TYPE,NP,LNL,AIC
+  output = "#{my_results.sequence},#{my_results.clock_type},#{my_results.np},#{my_results.lnL},#{my_results.AIC}"
+  
+  # First, let's add the output to its own CSV file
+  filename = "#{output_directory}/#{my_results.sequence}.#{my_results.clock_type}.csv"
+  my_results.create_own_results_file(filename,output)
+
+  # Now, let's add the output to the bottom of an "all results" CSV file
+  filename = "#{output_directory}/all_results.csv"
+  my_results.add_to_all_results_file(filename,output)
 
   # Return the np/lnL/AIC to the command line
+  puts "sequence:"
+  puts my_results.sequence
   puts "np:"
   puts my_results.np
   puts "lnL:"
