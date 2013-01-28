@@ -88,13 +88,12 @@ if options[:parse]
   filename = "#{output_directory}/all_results.csv"
   my_results.add_to_all_results_file(filename,output)
 
-  # Return the np/lnL/AIC to the command line
-  puts "sequence:"
-  puts my_results.sequence
-  puts "np:"
-  puts my_results.np
-  puts "lnL:"
-  puts my_results.lnL
-  puts "AIC:"
-  puts my_results.AIC
+  # Return the np/lnL/AIC to the command line as a hash (so it's useful)
+  output_hash = {
+    :sequence => my_results.sequence,
+    :np => my_results.np,
+    :lnL => my_results.lnL,
+    :AIC => my_results.AIC
+  }
+  print output_hash
 end
