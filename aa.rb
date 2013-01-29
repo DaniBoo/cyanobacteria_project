@@ -1,4 +1,5 @@
 # Load in the classes we've created
+load "lib/string.rb"
 load "lib/codeml_results.rb"
 load "lib/control_file.rb"
 load "lib/fasta_file.rb"
@@ -12,10 +13,11 @@ options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: cyan.rb [options]"
 
-  opts.on('-g', '--generate [NAME]',  'Generate codeml control file')   { |v| options[:generate] = v; options[:g] = true }
-  opts.on('-p', '--parse NAME',     'Parse codeml results file')        { |v| options[:parse] = v }
-  opts.on('-i', '--input-directory NAME', 'Set input directory name')   { |v| options[:input_directory] = v }
-  opts.on('-o', '--output-directory NAME', 'Set output directory name') { |v| options[:output_directory] = v }
+  opts.on('-g', '--generate [NAME]',  'Generate codeml control file')     { |v| options[:generate] = v; options[:g] = true }
+  opts.on('-p', '--parse NAME',     'Parse codeml results file')          { |v| options[:parse] = v }
+  opts.on('-c', '--convert-fasta-aa', 'Convert fasta files to aa')        { options[:convert] = true }
+  opts.on('-i', '--input-directory NAME', 'Set input directory name ')    { |v| options[:input_directory] = v }
+  opts.on('-o', '--output-directory NAME', 'Set output directory name')   { |v| options[:output_directory] = v }
 
   opts.on( '-h', '--help', 'Display this screen' ) do
     puts opts
@@ -30,6 +32,8 @@ if options[:input_directory]
   input_directory = options[:input_directory]
 elsif options[:parse]
   input_directory = "codeml_files/mlc_files"
+elsif options[:convert]
+  input_directory = "codeml_files/fasta"
 end
 
 # Output Directory
@@ -39,6 +43,8 @@ elsif options[:g]
   output_directory = "codeml_files/control_files"
 elsif options[:parse]
   output_directory = "codeml_files/aa_output"
+elsif options[:convert]
+  output_directory = "codeml_files/sequences"
 end
 
 
@@ -119,4 +125,30 @@ if options[:parse]
     }
     print output_hash
   end
+end
+
+# Convert the fasta files to aa files
+if options[:convert]
+  # Set the name of the models_list_file files
+  models_list_file = "univ_singlecopy_models.txt"
+
+  my_fasta_file = FastaFile.new("#{input_directory}/#{models_list_file}")
+
+  my_fasta_file.file_array.each do |file|
+    sequence_number = file.split("_")[0]
+    sequence_file = "#{sequence_number}.aa"
+
+    source = "#{input_directory}/#{file}"
+    destination = "#{output_directory}/#{sequence_file}"
+
+    # http://ruby-doc.org/stdlib-1.9.3/libdoc/fileutils/rdoc/FileUtils.html
+    # Check if the file exists first
+    if File.exist? source
+      FileUtils.cp(source, destination)
+    else
+      error_file = "#{output_directory}/errors.csv"
+      my_fasta_file.add_to_errors_file(error_file,source)
+    end
+  end
+
 end
