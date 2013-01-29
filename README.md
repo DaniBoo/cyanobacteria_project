@@ -229,5 +229,5 @@ Using Ruby's inbuilt OptionParser functionality
 ### 28/01/2013
 Downloaded Diffmerge on recommendation for comparing files
 
-Lots of work to cycle through directories and create / move files
+Lots of work to cycle through directories and create / move files.
 
