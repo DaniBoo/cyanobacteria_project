@@ -23,13 +23,8 @@ describe CodemlResults do
 
   end
 
-  # # The tests for the lnL() method
-  # context "get the lnL" do
-
-  #   it "fails when there's no occurence of the lnL in the " do
-  #     # 
-  #   end
-
-  # end
+  # Need to write more tests!
+  # Got started but then these became a bit of pain to do
+  # Will look at them later (perhaps)
 
 end

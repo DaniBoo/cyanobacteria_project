@@ -54,9 +54,11 @@ elsif options[:convert]
   output_directory = "codeml_files/sequences"
 end
 
-
 # Control File
 control_filename = "codeml.ctl"
+
+# Datfile path
+datfile_path = "bin"
 
 
 # Generate the control file
@@ -72,49 +74,57 @@ if options[:g]
     my_control_file = ControlFile.new
 
     # Set whatever attributes we need to
-    
+
+    # First, let's determine if I, F and G are there or not
+    has_f = model[/\+(f|F)/]
+    has_i = model[/\+(i|I)/]
+    has_g = model[/\+(g|G)/]
+
     # Model - if no F then is 2, if F then is 3
-    if model[/\+(f|F)/]
-      puts "3"
+    # Needs to be +F (or +f)
+    if has_f
       my_control_file.model = 3
     else
-      puts "2"
       my_control_file.model = 2
     end
 
-    # aaRatefile - depends on first part of model eg LG
-    my_control_file.aaRatefile = 'LG.dat'
+    # aaRatefile - depends on first part of model eg LG (the bit before the plus)
+    # So we split the model on + and use the first section / item in array
+    aaRatefile_root = model.split("+")[0]
+    aaRatefile_filename = "#{datfile_path}/#{aaRatefile_root}.dat"
+    my_control_file.aaRatefile = aaRatefile_filename
 
-    # Fix_alpha - depends on model 0 unless no I and no G
-    my_control_file.fix_alpha = 0
-
+    # Fix_alpha - depends on model 1 unless no I and no G, else 0
     # alpha - if no I, no G then is 0, else is 0.5
-    my_control_file.alpha
+    if !has_i && !has_g
+      my_control_file.alpha = 0
+      my_control_file.fix_alpha = 1
+    else
+      my_control_file.alpha = 0.5
+      my_control_file.fix_alpha = 0
+    end
 
     # alpha - if no I, no G then is 0. If I, no G is 2. If I and G is 5. If G, no I is 4.
-    my_control_file.nCatG
+    if !has_i && !has_g
+      my_control_file.nCatG = 1
+    elsif has_i && !has_g
+      my_control_file.nCatG = 2
+    elsif has_i && has_g
+      my_control_file.nCatG = 5
+    elsif !has_i && has_g
+      my_control_file.nCatG = 4
+    end
 
-    #Create the control file
-    puts my_control_file.create("#{output_directory}/#{sequence}/#{control_filename}")
+    # First create the control file for G clock
+    # 1 for G Clock
+    my_control_file.clock = 1
+    puts my_control_file.create("#{output_directory}/#{sequence}_gclock/#{control_filename}")
+
+    # Then create the control file for no clock
+    # 0 for no Clock
+    my_control_file.clock = 0
+    puts my_control_file.create("#{output_directory}/#{sequence}_nonclock/#{control_filename}")
   end
-
-  # my_fasta_file.file_array.each do |file|
-  #   sequence_number = file.split("_")[0]
-  #   sequence_file = "#{sequence_number}.aa"
-
-  #   source = "#{input_directory}/#{file}"
-  #   destination = "#{output_directory}/#{sequence_file}"
-
-  #   # http://ruby-doc.org/stdlib-1.9.3/libdoc/fileutils/rdoc/FileUtils.html
-  #   # Check if the file exists first
-  #   if File.exist? source
-  #     FileUtils.cp(source, destination)
-  #   else
-  #     error_file = "#{output_directory}/errors.csv"
-  #     my_fasta_file.add_to_errors_file(error_file,source)
-  #   end
-  # end
-
 
 end
 

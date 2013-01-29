@@ -4,7 +4,7 @@ require "fileutils"
 
 class ControlFile
 
-  attr_accessor :aaRatefile, :model, :fix_alpha, :alpha, :nCatG
+  attr_accessor :aaRatefile, :model, :fix_alpha, :alpha, :nCatG, :clock
 
   # Reads in a file
   def read(filename)
