@@ -1,5 +1,5 @@
-      seqfile = 173.aa * sequence data filename
-     treefile = 173.trees      * tree structure file name
+      seqfile = 223.aa * sequence data filename
+     treefile = 223.trees      * tree structure file name
       outfile = mlc           * main result file name
 
         noisy = 1  * 0,1,2,3,9: how much rubbish on the screen

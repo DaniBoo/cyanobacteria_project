@@ -226,3 +226,8 @@ http://stackoverflow.com/questions/4244611/pass-variables-to-ruby-script-via-com
 Using Ruby's inbuilt OptionParser functionality
 
 
+### 28/01/2013
+Downloaded Diffmerge on recommendation for comparing files
+
+Lots of work to cycle through directories and create / move files
+

@@ -18,6 +18,8 @@ OptionParser.new do |opts|
   opts.on('-c', '--convert-fasta-aa', 'Convert fasta files to aa')        { options[:convert] = true }
   opts.on('-i', '--input-directory NAME', 'Set input directory name ')    { |v| options[:input_directory] = v }
   opts.on('-o', '--output-directory NAME', 'Set output directory name')   { |v| options[:output_directory] = v }
+  opts.on('-m', '--match FILE', 'Check a file matches')                    { |v| options[:match] = v }
+  opts.on('-w', '--with FILE', '.. with another file')                     { |v| options[:with] = v }
 
   opts.on( '-h', '--help', 'Display this screen' ) do
     puts opts
@@ -115,6 +117,9 @@ if options[:g]
       my_control_file.nCatG = 4
     end
 
+    # Set the sequence
+    my_control_file.sequence = sequence
+
     # First create the control file for G clock
     # 1 for G Clock
     my_control_file.clock = 1
@@ -178,26 +183,71 @@ if options[:parse]
   end
 end
 
-# Convert the fasta files to aa files
+# Convert the fasta files to aa files / and rename and move trees
+# Note: MUST run -g first at present (will try to fix later)
 if options[:convert]
 
+  # Do FASTA files to AA first
   my_fasta_file = FastaFile.new("#{input_directory}/#{models_list_file}")
 
   my_fasta_file.file_array.each do |file|
     sequence_number = file.split("_")[0]
     sequence_file = "#{sequence_number}.aa"
+    trees_file = "#{sequence_number}.trees"
 
+    # Copying the file to 2 places
     source = "#{input_directory}/#{file}"
-    destination = "#{output_directory}/#{sequence_file}"
+
+    # destination = "#{output_directory}/#{sequence_file}"
+    gclock_destination = "codeml_files/control_files/#{sequence_number}_gclock/#{sequence_file}"
+    nonclock_destination = "codeml_files/control_files/#{sequence_number}_nonclock/#{sequence_file}"
 
     # http://ruby-doc.org/stdlib-1.9.3/libdoc/fileutils/rdoc/FileUtils.html
     # Check if the file exists first
     if File.exist? source
-      FileUtils.cp(source, destination)
+      # Copy to all 2 destinations
+      # FileUtils.cp(source, destination) # Not going to use for now
+      FileUtils.cp(source, gclock_destination)
+      FileUtils.cp(source, nonclock_destination)
     else
-      error_file = "#{output_directory}/errors.csv"
+      error_file = "codeml_files/errors/aa_errors.csv"
       my_fasta_file.add_to_errors_file(error_file,source)
     end
+
+    trees_source = "codeml_files/trees/#{sequence_number}_MAFFT_ALIGNED.phy_phyml_tree.txt"
+    trees_gclock_destination = "codeml_files/control_files/#{sequence_number}_gclock/#{trees_file}"
+    trees_nonclock_destination = "codeml_files/control_files/#{sequence_number}_nonclock/#{trees_file}"
+
+    if File.exist? trees_source
+      # Copy to all 2 destinations
+      FileUtils.cp(trees_source, trees_gclock_destination)
+      FileUtils.cp(trees_source, trees_nonclock_destination)
+    else
+      error_file = "codeml_files/errors/trees_errors.csv"
+      my_fasta_file.add_to_errors_file(error_file,trees_source)
+    end
+
   end
 
 end
+
+
+# Check two files to see if they match
+if options[:match] && options[:with]
+  # read in the contents of the two files to variables
+  match = File.read options[:match] if File.exist? options[:match]
+  with = File.read options[:with] if File.exist? options[:with]
+  
+  # Check the files exist and aren't empty
+  if (File.exist? options[:match]) && (File.exist? options[:with])
+    if match == with
+      puts "Files are identical"
+    else
+      puts "Possible difference between files. Please check manually."
+    end
+  else
+    puts "Match doesn't exist" unless File.exist? options[:match]
+    puts "With doesn't exist" unless File.exist? options[:with]
+  end
+end
+
