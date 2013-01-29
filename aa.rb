@@ -13,7 +13,7 @@ options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: cyan.rb [options]"
 
-  opts.on('-g', '--generate [NAME]',  'Generate codeml control file')     { |v| options[:generate] = v; options[:g] = true }
+  opts.on('-g', '--generate [NAME]',  'Generate codeml control file')     { options[:g] = true }
   opts.on('-p', '--parse NAME',     'Parse codeml results file')          { |v| options[:parse] = v }
   opts.on('-c', '--convert-fasta-aa', 'Convert fasta files to aa')        { options[:convert] = true }
   opts.on('-i', '--input-directory NAME', 'Set input directory name ')    { |v| options[:input_directory] = v }
@@ -25,15 +25,22 @@ OptionParser.new do |opts|
 
 end.parse!
 
-# Set detaults
+# Set defaults and options
+
+# Set the name of the models_list_file files
+models_list_file = "univ_singlecopy_models.txt" 
+# Will always need to be in input_directory set below
+# Needs to be where fasta files are stored
 
 # Input Directory
 if options[:input_directory]
   input_directory = options[:input_directory]
+elsif options[:g]
+  input_directory = "codeml_files/fasta" #note must be same as for :convert
 elsif options[:parse]
   input_directory = "codeml_files/mlc_files"
 elsif options[:convert]
-  input_directory = "codeml_files/fasta"
+  input_directory = "codeml_files/fasta" #note must be same as for :g
 end
 
 # Output Directory
@@ -49,32 +56,66 @@ end
 
 
 # Control File
-options[:generate] ? control_filename = options[:generate] : control_filename = "codeml.ctl"
+control_filename = "codeml.ctl"
 
 
 # Generate the control file
 if options[:g]
-  # Create a new control file in memory
-  my_control_file = ControlFile.new
 
-  # Set whatever attributes we need to
-  # Model - if no F then is 2, if F then is 3
-  my_control_file.model = 2
+  # First, let's get a hash of all sequences vs models
 
-  # aaRatefile - depends on first part of model eg LG
-  my_control_file.aaRatefile = 'LG.dat'
+  my_fasta_file = FastaFile.new("#{input_directory}/#{models_list_file}")
 
-  # Fix_alpha - depends on model 0 unless no I and no G
-  my_control_file.fix_alpha = 0
+  my_fasta_file.sequences_hash.each do |sequence,model|
 
-  # alpha - if no I, no G then is 0, else is 0.5
-  my_control_file.alpha
+    # Create a new control file in memory
+    my_control_file = ControlFile.new
 
-  # alpha - if no I, no G then is 0. If I, no G is 2. If I and G is 5. If G, no I is 4.
-  my_control_file.nCatG
+    # Set whatever attributes we need to
+    
+    # Model - if no F then is 2, if F then is 3
+    if model[/\+(f|F)/]
+      puts "3"
+      my_control_file.model = 3
+    else
+      puts "2"
+      my_control_file.model = 2
+    end
 
-  #Create the control file
-  puts my_control_file.create("#{output_directory}/#{control_filename}")
+    # aaRatefile - depends on first part of model eg LG
+    my_control_file.aaRatefile = 'LG.dat'
+
+    # Fix_alpha - depends on model 0 unless no I and no G
+    my_control_file.fix_alpha = 0
+
+    # alpha - if no I, no G then is 0, else is 0.5
+    my_control_file.alpha
+
+    # alpha - if no I, no G then is 0. If I, no G is 2. If I and G is 5. If G, no I is 4.
+    my_control_file.nCatG
+
+    #Create the control file
+    puts my_control_file.create("#{output_directory}/#{sequence}/#{control_filename}")
+  end
+
+  # my_fasta_file.file_array.each do |file|
+  #   sequence_number = file.split("_")[0]
+  #   sequence_file = "#{sequence_number}.aa"
+
+  #   source = "#{input_directory}/#{file}"
+  #   destination = "#{output_directory}/#{sequence_file}"
+
+  #   # http://ruby-doc.org/stdlib-1.9.3/libdoc/fileutils/rdoc/FileUtils.html
+  #   # Check if the file exists first
+  #   if File.exist? source
+  #     FileUtils.cp(source, destination)
+  #   else
+  #     error_file = "#{output_directory}/errors.csv"
+  #     my_fasta_file.add_to_errors_file(error_file,source)
+  #   end
+  # end
+
+
 end
 
 
@@ -129,8 +170,6 @@ end
 
 # Convert the fasta files to aa files
 if options[:convert]
-  # Set the name of the models_list_file files
-  models_list_file = "univ_singlecopy_models.txt"
 
   my_fasta_file = FastaFile.new("#{input_directory}/#{models_list_file}")
 
