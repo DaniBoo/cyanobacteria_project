@@ -6,6 +6,7 @@ load "lib/fasta_file.rb"
 
 # Require the following
 require "optparse"
+require "timeout"
 
 # Pull in options passed from the command line
 # Used technique here - http://stackoverflow.com/questions/4244611/pass-variables-to-ruby-script-via-command-line
@@ -18,8 +19,9 @@ OptionParser.new do |opts|
   opts.on('-c', '--convert-fasta-aa', 'Convert fasta files to aa')        { options[:convert] = true }
   opts.on('-i', '--input-directory NAME', 'Set input directory name ')    { |v| options[:input_directory] = v }
   opts.on('-o', '--output-directory NAME', 'Set output directory name')   { |v| options[:output_directory] = v }
-  opts.on('-m', '--match FILE', 'Check a file matches')                    { |v| options[:match] = v }
-  opts.on('-w', '--with FILE', '.. with another file')                     { |v| options[:with] = v }
+  opts.on('-m', '--match FILE', 'Check a file matches')                   { |v| options[:match] = v }
+  opts.on('-w', '--with FILE', '.. with another file')                    { |v| options[:with] = v }
+  opts.on('-r', '--run DIRECTORY', 'Run codeml on a specific directory (within codeml_files/control_files) or "all"')  { |v| options[:run] = v }
 
   opts.on( '-h', '--help', 'Display this screen' ) do
     puts opts
@@ -145,8 +147,8 @@ if options[:parse]
     input_hash =  {input_directory => filename}
   else
     # Found technique here: http://stackoverflow.com/questions/6419301/iterate-through-every-jpg-or-jpeg-file-in-directory-and-sub-directory
-    # Get a list of mlc files in any subdirectory of codeml_files/aa_input
-    Dir.glob("codeml_files/aa_input/**/mlc").each do |directory_and_file|
+    # Get a list of mlc files in any subdirectory of codeml_files/control_files
+    Dir.glob("codeml_files/control_files/**/mlc").each do |directory_and_file|
 
       # remove last 4 characters (/mlc) from the string http://stackoverflow.com/questions/1392487/remove-the-last-2-characters-from-a-string-in-ruby
       directory = directory_and_file[0..-5]
@@ -249,5 +251,53 @@ if options[:match] && options[:with]
     puts "Match doesn't exist" unless File.exist? options[:match]
     puts "With doesn't exist" unless File.exist? options[:with]
   end
+end
+
+
+# Run codeml
+if options[:run]
+  # Using "bacticks" runs a Linux command
+  # First get the current directory and assign it to a variable
+  current_directory = `pwd`.chomp
+  
+  if options[:run] != 'all'
+    # which directory are we working with? (full path)
+    
+    full_directory = "#{current_directory}/codeml_files/control_files/#{options[:run]}"
+    
+    # check if there's a control file in the specified directory
+    if File.exist? "#{full_directory}/codeml.ctl"
+    
+      # go to the directory specified by -r and run codeml
+      linux_command = "cd #{full_directory} && codeml"
+      
+      puts "starting process: #{linux_command}"
+      `#{linux_command}`
+    
+    else
+      puts "Can't find a control file at: #{full_directory}/codeml.ctl"
+    end
+    
+  else
+    # Cycle through all directories. Not done yet though.
+    
+    # Found technique here: http://stackoverflow.com/questions/6419301/iterate-through-every-jpg-or-jpeg-file-in-directory-and-sub-directory
+    # Get a list of subdirectories of codeml_files/control_files
+    Dir.glob("#{current_directory}/codeml_files/control_files/**").each do |full_directory|
+
+      # Check if the control file exists
+      if File.exist? "#{full_directory}/codeml.ctl"
+      
+        # go to the directory and run codeml
+        linux_command = "cd #{full_directory} && codeml"
+        
+        puts "starting process: #{linux_command}"
+        `#{linux_command}`
+      else
+        puts "Can't find a control file at: #{full_directory}/codeml.ctl"
+      end
+      
+    end
+  end 
 end
 
