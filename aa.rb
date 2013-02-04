@@ -21,7 +21,7 @@ OptionParser.new do |opts|
   opts.on('-o', '--output-directory NAME', 'Set output directory name')   { |v| options[:output_directory] = v }
   opts.on('-m', '--match FILE', 'Check a file matches')                   { |v| options[:match] = v }
   opts.on('-w', '--with FILE', '.. with another file')                    { |v| options[:with] = v }
-  opts.on('-r', '--run DIRECTORY', 'Run codeml on a specific directory (within codeml_files/control_files) or "all"')  { |v| options[:run] = v }
+  opts.on('-r', '--run DIRECTORY', 'Run codeml on a specific directory (within codeml_files/control_files) or "new" or "all"')  { |v| options[:run] = v }
 
   opts.on( '-h', '--help', 'Display this screen' ) do
     puts opts
@@ -260,7 +260,7 @@ if options[:run]
   # First get the current directory and assign it to a variable
   current_directory = `pwd`.chomp
   
-  if options[:run] != 'all'
+  if options[:run] != 'all' && options[:run] != 'new'
     # which directory are we working with? (full path)
     
     full_directory = "#{current_directory}/codeml_files/control_files/#{options[:run]}"
@@ -290,31 +290,55 @@ if options[:run]
     
     Dir.glob("#{current_directory}/codeml_files/control_files/**").each do |full_directory|
 
-      # Check if the control file exists
-      if File.exist? "#{full_directory}/codeml.ctl"
-        
-        # go to the directory and run codeml
-        linux_command = "cd #{full_directory} && codeml"
-        
-        puts "starting process: #{linux_command}"
-        
-        `#{linux_command}`
-        
-        # Print times
-        time_elapsed = Time.now - start_time
-        time_since_last_process = Time.now - last_process_time
-        
-        puts "#{time_elapsed.to_i} seconds taken so far"
-        puts "#{time_since_last_process.to_i} seconds taken for last process"
-        puts "#{process_count} process run so far\n\n"
-        
-        process_count += 1
-        last_process_time = Time.now
-        
-      else
-        puts "Can't find a control file at: #{full_directory}/codeml.ctl"
+      # Check if the "done" file has been set AND the aa.rb -r option is set as 'new'
+      ignore = false
+      if File.exist? "#{full_directory}/done"
+        if options[:run] == 'new'
+          ignore = true
+        end
       end
       
+      # Should we ignore this process?
+      if ignore
+        puts "There's already an MLC file at: #{full_directory}"
+      else 
+
+        # Check if the control file exists
+        if File.exist? "#{full_directory}/codeml.ctl"
+          
+          # Get rid of any "done" file
+          `rm #{full_directory}/done`
+          
+          # go to the directory and run codeml
+          linux_command = "cd #{full_directory} && codeml"
+          
+          puts "starting process: #{linux_command}"
+          
+          `#{linux_command}`
+          
+          # Print times
+          time_elapsed = Time.now - start_time
+          time_since_last_process = Time.now - last_process_time
+          
+          puts "#{time_elapsed.to_i} seconds taken so far"
+          puts "#{time_since_last_process.to_i} seconds taken for last process"
+          puts "#{process_count} process run so far"
+          
+          process_count += 1
+          last_process_time = Time.now
+          
+          # Put a done file in the directory to say codeml's been completed
+          # Can't look for MLC as this can be incomplete if process is interupted
+          
+          `touch #{full_directory}/done`
+          
+          puts "Process complete\n\n"
+          
+        else
+          puts "Can't find a control file at: #{full_directory}/codeml.ctl"
+        end
+        
+      end
     end
   end 
 end
