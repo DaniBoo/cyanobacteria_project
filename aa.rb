@@ -308,7 +308,7 @@ if options[:run]
         puts "#{time_since_last_process.to_i} seconds taken for last process"
         puts "#{process_count} process run so far\n\n"
         
-        process_count++
+        process_count += 1
         last_process_time = Time.now
         
       else
