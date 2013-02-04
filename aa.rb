@@ -283,16 +283,34 @@ if options[:run]
     
     # Found technique here: http://stackoverflow.com/questions/6419301/iterate-through-every-jpg-or-jpeg-file-in-directory-and-sub-directory
     # Get a list of subdirectories of codeml_files/control_files
+    
+    start_time = Time.now
+    last_process_time = start_time
+    process_count = 1
+    
     Dir.glob("#{current_directory}/codeml_files/control_files/**").each do |full_directory|
 
       # Check if the control file exists
       if File.exist? "#{full_directory}/codeml.ctl"
-      
+        
         # go to the directory and run codeml
         linux_command = "cd #{full_directory} && codeml"
         
         puts "starting process: #{linux_command}"
+        
         `#{linux_command}`
+        
+        # Print times
+        time_elapsed = Time.now - start_time
+        time_since_last_process = Time.now - last_process_time
+        
+        puts "#{time_elapsed.to_i} seconds taken so far"
+        puts "#{time_since_last_process.to_i} seconds taken for last process"
+        puts "#{process_count} process run so far\n\n"
+        
+        process_count++
+        last_process_time = Time.now
+        
       else
         puts "Can't find a control file at: #{full_directory}/codeml.ctl"
       end
