@@ -293,14 +293,12 @@ if options[:run]
       # Check if the "done" file has been set AND the aa.rb -r option is set as 'new'
       ignore = false
       if File.exist? "#{full_directory}/done"
-        if options[:run] == 'new'
-          ignore = true
-        end
+        ignore = true if options[:run] == 'new'
       end
       
       # Should we ignore this process?
       if ignore
-        puts "There's already an MLC file at: #{full_directory}"
+        puts "There's already a completed MLC file at: #{full_directory}"
       else 
 
         # Check if the control file exists
