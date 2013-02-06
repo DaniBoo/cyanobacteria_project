@@ -15,7 +15,7 @@ OptionParser.new do |opts|
   opts.banner = "Usage: cyan.rb [options]"
 
   opts.on('-g', '--generate [NAME]',  'Generate codeml control file')     { options[:g] = true }
-  opts.on('-p', '--parse NAME',     'Parse codeml results file')          { |v| options[:parse] = v }
+  opts.on('-p', '--parse NAME or "any"',     'Parse codeml results file')          { |v| options[:parse] = v }
   opts.on('-c', '--convert-fasta-aa', 'Convert fasta files to aa')        { options[:convert] = true }
   opts.on('-i', '--input-directory NAME', 'Set input directory name ')    { |v| options[:input_directory] = v }
   opts.on('-o', '--output-directory NAME', 'Set output directory name')   { |v| options[:output_directory] = v }
@@ -269,7 +269,7 @@ if options[:run]
     if File.exist? "#{full_directory}/codeml.ctl"
     
       # go to the directory specified by -r and run codeml
-      linux_command = "cd #{full_directory} && codeml"
+      linux_command = "cd #{full_directory} && #{current_directory}/bin/codeml"
       
       puts "starting process: #{linux_command}"
       `#{linux_command}`
@@ -305,10 +305,10 @@ if options[:run]
         if File.exist? "#{full_directory}/codeml.ctl"
           
           # Get rid of any "done" file
-          `rm #{full_directory}/done`
+          `rm #{full_directory}/done` if File.exist? "#{full_directory}/done"
           
           # go to the directory and run codeml
-          linux_command = "cd #{full_directory} && codeml"
+          linux_command = "cd #{full_directory} && #{current_directory}/bin/codeml"
           
           puts "starting process: #{linux_command}"
           
