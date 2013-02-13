@@ -25,6 +25,27 @@ class ControlFile
 
     "#{path} created"
   end
+  
+  # Add output to a file and create the file if it doesn't exist yet
+  # A bit of repetition in this class from create_file
+  def add_to_file(path, contents)
+    dir = File.dirname(path)
+
+    unless File.directory?(dir)
+      FileUtils.mkdir_p(dir)
+    end
+
+    # Using technique outlined here: http://www.dzone.com/snippets/ruby-open-file-write-it-and
+
+    File.open(path, 'a') {|f| f.write("#{contents}\n") }
+
+    "#{path} updated"
+  end
+  
+  # adds the results to an "errors" file
+  def add_to_errors_file(filename,output)
+    self.add_to_file(filename,output)
+  end
 
   # creates a new control file
   def create(filename)

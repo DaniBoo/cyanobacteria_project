@@ -95,7 +95,28 @@ if options[:g]
     # aaRatefile - depends on first part of model eg LG (the bit before the plus)
     # So we split the model on + and use the first section / item in array
     aaRatefile_root = model.split("+")[0]
+    
+    # Need to deal with a list of files that map to other files eg JTT.dat => jones.dat
+    aaRateFile_mappings = {
+      'JTT' => 'jones',
+      'DCMut' => 'dayhoff-dcmut'
+    }
+    # Note DCMut can use dayhoff or jones .. so check which??
+    
+    aaRateFile_mappings.each do |key,value|
+      aaRatefile_root = value if aaRatefile_root == key
+    end
+    
     aaRatefile_filename = "#{datfile_path}/#{aaRatefile_root}.dat"
+    
+    # Check if the ratefile actually exists
+    # If not, skip this 
+    unless File.exist? aaRatefile_filename
+      error_file = "codeml_files/errors/ctl_errors.csv"
+      my_control_file.add_to_errors_file(error_file,"#{aaRatefile_filename},#{sequence}")
+      next
+    end
+    
     my_control_file.aaRatefile = aaRatefile_filename
 
     # Fix_alpha - depends on model 1 unless no I and no G, else 0
@@ -320,7 +341,7 @@ if options[:run]
           
           puts "#{time_elapsed.to_i} seconds taken so far"
           puts "#{time_since_last_process.to_i} seconds taken for last process"
-          puts "#{process_count} process run so far"
+          puts "#{process_count} process(es) run so far"
           
           process_count += 1
           last_process_time = Time.now
