@@ -231,3 +231,21 @@ Downloaded Diffmerge on recommendation for comparing files
 
 Lots of work to cycle through directories and create / move files.
 
+### VARIOUS
+
+
+### 17/02/2013
+Need to tidy up trees
+Started using BioRuby for these aspects, so added
+
+    gem "bio"
+
+.. to the Gemfile
+
+Can pull in the newick format and convert to a Bio::tree without problems.  However manipulation doesn't seem to work (eg. setting :bootstrap_file => :disabled doesn't work as documented)
+
+Think the best way to do this may be to convert Newick trees to PhyloXML .. make changes and convert back.  As this leads to less edge cases / unknowns than running regexes on the Newick.
+
+
+
+

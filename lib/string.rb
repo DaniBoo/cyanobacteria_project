@@ -10,4 +10,41 @@ class String
     self[first_newline..-1]
   end
 
+  # Remove species from a Newick tree
+  def strip_species 
+    regex = /_[a-z]{3}/
+    self.gsub(regex,'')
+  end
+
+  # Remove node labels
+  def strip_node_labels
+    regex = /(,)*(n|r)[0-9]+/
+    self.gsub(regex,'')
+  end
+
+  # Remove bootstrap from a Newick tree
+  def strip_bootstrap
+    regex = /:\d+(\.\d{1,2})?/
+    self.gsub(regex,'')
+  end
+
+  # Find lost genes in a Newick tree node
+  def matches_lost_genes?
+    regex = /^[a-z]{3}\*LOST$/
+    true if self =~ regex
+  end
+
+  # Find lost genes in a Newick tree node
+  def matches_lost_nodes?
+    regex = /^(n|r)[0-9]{2}\*LOST$/
+    true if self =~ regex
+  end
+
+
+  # Find blacklisted strings with Regex
+  def is_blacklisted?
+    # true if self.matches_lost_genes? || self.matches_lost_nodes?
+    true if self.matches_lost_nodes?
+  end
+
 end

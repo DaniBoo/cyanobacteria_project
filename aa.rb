@@ -3,10 +3,12 @@ load "lib/string.rb"
 load "lib/codeml_results.rb"
 load "lib/control_file.rb"
 load "lib/fasta_file.rb"
+load "lib/tree_file.rb"
 
 # Require the following
 require "optparse"
 require "timeout"
+require "bio"
 
 # Pull in options passed from the command line
 # Used technique here - http://stackoverflow.com/questions/4244611/pass-variables-to-ruby-script-via-command-line
@@ -15,12 +17,13 @@ OptionParser.new do |opts|
   opts.banner = "Usage: cyan.rb [options]"
 
   opts.on('-g', '--generate [NAME]',  'Generate codeml control file')     { options[:g] = true }
-  opts.on('-p', '--parse NAME or "any"',     'Parse codeml results file')          { |v| options[:parse] = v }
+  opts.on('-p', '--parse NAME or "any"',     'Parse codeml results file') { |v| options[:parse] = v }
   opts.on('-c', '--convert-fasta-aa', 'Convert fasta files to aa')        { options[:convert] = true }
   opts.on('-i', '--input-directory NAME', 'Set input directory name ')    { |v| options[:input_directory] = v }
   opts.on('-o', '--output-directory NAME', 'Set output directory name')   { |v| options[:output_directory] = v }
   opts.on('-m', '--match FILE', 'Check a file matches')                   { |v| options[:match] = v }
   opts.on('-w', '--with FILE', '.. with another file')                    { |v| options[:with] = v }
+  opts.on('-t', '--trees FILE', 'Tidy the trees')                              { |v| options[:trees] = v }
   opts.on('-r', '--run DIRECTORY', 'Run codeml on a specific directory (within codeml_files/control_files) or "new" or "all"')  { |v| options[:run] = v }
 
   opts.on( '-h', '--help', 'Display this screen' ) do
@@ -360,5 +363,48 @@ if options[:run]
       end
     end
   end 
+end
+
+if options[:trees]
+  trees_directory = "codeml_files/new_trees/"
+  tree_path = options[:trees]
+
+  # pull in a tree file
+  my_tree_file = TreeFile.new("#{trees_directory}/#{tree_path}")
+
+  # Assign the raw contents of the file to a variable  
+  newick_raw = my_tree_file.raw_output
+
+  # Create a new Bio::Newick object based on the raw contents of the file
+  my_newick = Bio::Newick.new newick_raw
+  buffer = my_newick.tree.output_newick.gsub /(\s)*(\n)*(\s)*/, ''
+  puts buffer
+  puts my_tree_file.create_file("#{trees_directory}/original.#{tree_path}",buffer)
+
+  
+
+  puts "\n\n\n"
+  puts "\n\n\n"
+  puts "\n\n\n"
+  puts "---"
+  puts "\n\n\n"
+  puts "\n\n\n"
+  puts "\n\n\n"
+
+  # Put all nodes in an array
+  newick_array = my_newick.tree.nodes
+
+  # Cycle through them
+  newick_array.each do |node|
+    # Remove the node if it's a blacklisted one
+    my_newick.tree.remove_node(node) if node.to_s.is_blacklisted?
+  end
+
+  # Strip all the stuff we need to Convert it all back to Newick format
+  buffer = my_newick.tree.output_newick.strip_species.strip_bootstrap.gsub /(\s)*(\n)*(\s)*/, ''
+  puts my_newick.tree.output_newick.strip_species.strip_bootstrap
+
+  # Write the newick to a file
+  puts my_tree_file.create_file("#{trees_directory}/output.#{tree_path}",buffer)
 end
 
