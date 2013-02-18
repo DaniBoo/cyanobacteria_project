@@ -369,6 +369,7 @@ if options[:trees]
   trees_source_directory = "codeml_files/newick_trees_original/"
   trees_target_directory = "codeml_files/newick_trees_new/"
 
+  # Convert an individual tree file
   if options[:trees].downcase != "all"
     
     tree_path = options[:trees]
@@ -401,6 +402,8 @@ if options[:trees]
     # Write the newick to a file
     puts my_tree_file.create_file("#{trees_target_directory}/#{tree_path}",buffer)
   else
+
+    # Or do it for all files in the directory
     current_directory = `pwd`.chomp
     tree_count = 0
     warning_message = ""

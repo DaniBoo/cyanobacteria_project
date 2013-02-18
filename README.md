@@ -246,6 +246,12 @@ Can pull in the newick format and convert to a Bio::tree without problems.  Howe
 
 Think the best way to do this may be to convert Newick trees to PhyloXML .. make changes and convert back.  As this leads to less edge cases / unknowns than running regexes on the Newick.
 
+## Later same day...
+
+In the end didn't need to convert to PhyloXML. Parsing the Newick to a  Bio::Tree was enough to remove the lost nodes .. then the rest could be done with regex.
+
+The overall process once written ran very quickly. It look around 1 minute to process all 19,000ish trees.
+
 
 
 
