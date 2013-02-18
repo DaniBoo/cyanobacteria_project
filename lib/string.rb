@@ -16,10 +16,41 @@ class String
     self.gsub(regex,'')
   end
 
-  # Remove node labels
-  def strip_node_labels
-    regex = /(,)*(n|r)[0-9]+/
-    self.gsub(regex,'')
+  # Replace node labels with #X (where X is node number)
+  # Works on the assumption all node numbers are unique for a given string / Newick
+  def replace_node_numbers
+    regex = /[n|r][0-9]+/
+
+    # Start counting nodes
+    node_count = 1
+
+    # Empty hash to link node numbers to node count
+    node_number_hash = {}
+
+    # Go through each match of the regex
+    self.scan regex do |node_number|
+
+      # Add the node number and count to the hash
+      node_number_hash[node_number] = "##{node_count}"
+
+      # Increment the count by one
+      node_count += 1
+    end
+
+    # Now go through each key,value pair in the hash
+    node_number_hash.each do |key,value|
+      # Do a simple replace on of the key with the value in the original string
+      self.sub!(key,value)
+    end
+
+    # Return the modified string
+    self
+  end
+
+  # Replace node labels with #X (where X is node number)
+  def is_node_label?
+    regex = /[,]*[n|r][0-9]+/
+    true if self =~ regex
   end
 
   # Remove bootstrap from a Newick tree
@@ -36,7 +67,7 @@ class String
 
   # Find lost genes in a Newick tree node
   def matches_lost_nodes?
-    regex = /^(n|r)[0-9]{2}\*LOST$/
+    regex = /^[n|r][0-9]{2}\*LOST$/
     true if self =~ regex
   end
 
