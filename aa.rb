@@ -122,25 +122,14 @@ if options[:g]
     
     my_control_file.aaRatefile = aaRatefile_filename
 
-    # Fix_alpha - depends on model 1 unless no I and no G, else 0
-    # alpha - if no I, no G then is 0, else is 0.5
-    if !has_i && !has_g
-      my_control_file.alpha = 0
-      my_control_file.fix_alpha = 1
-    else
-      my_control_file.alpha = 0.5
+    if has_g
       my_control_file.fix_alpha = 0
-    end
-
-    # alpha - if no I, no G then is 0. If I, no G is 2. If I and G is 5. If G, no I is 4.
-    if !has_i && !has_g
-      my_control_file.nCatG = 1
-    elsif has_i && !has_g
-      my_control_file.nCatG = 2
-    elsif has_i && has_g
-      my_control_file.nCatG = 5
-    elsif !has_i && has_g
+      my_control_file.alpha = 0.5
       my_control_file.nCatG = 4
+    else
+      my_control_file.fix_alpha = 1
+      my_control_file.alpha = 0
+      my_control_file.nCatG = 1
     end
 
     # Set the sequence
@@ -409,8 +398,6 @@ if options[:trees]
     warning_message = ""
 
     Dir.glob("#{current_directory}/#{trees_source_directory}**").each do |full_directory| 
-
-
 
       # pull in a tree file
       my_tree_file = TreeFile.new("#{full_directory}")
