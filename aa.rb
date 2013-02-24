@@ -4,6 +4,7 @@ load "lib/codeml_results.rb"
 load "lib/control_file.rb"
 load "lib/fasta_file.rb"
 load "lib/tree_file.rb"
+load "lib/rscript_file.rb"
 
 # Require the following
 require "optparse"
@@ -23,7 +24,8 @@ OptionParser.new do |opts|
   opts.on('-o', '--output-directory NAME', 'Set output directory name')   { |v| options[:output_directory] = v }
   opts.on('-m', '--match FILE', 'Check a file matches')                   { |v| options[:match] = v }
   opts.on('-w', '--with FILE', '.. with another file')                    { |v| options[:with] = v }
-  opts.on('-t', '--trees FILE', 'Tidy a specific tree or "all"')                              { |v| options[:trees] = v }
+  opts.on('-t', '--trees FILE', 'Tidy a specific tree or "all"')          { |v| options[:trees] = v }
+  opts.on('-s', '--rscript [FILE]', 'Generate rscript.R file')            { |v| options[:rscript_file] = v; options[:rscript] = true }
   opts.on('-r', '--run DIRECTORY', 'Run codeml on a specific directory (within codeml_files/control_files) or "new" or "all"')  { |v| options[:run] = v }
 
   opts.on( '-h', '--help', 'Display this screen' ) do
@@ -42,7 +44,7 @@ models_list_file = "univ_singlecopy_models.txt"
 # Input Directory
 if options[:input_directory]
   input_directory = options[:input_directory]
-elsif options[:g]
+elsif options[:g] || options[:rscript]
   input_directory = "codeml_files/fasta" #note must be same as for :convert
 elsif options[:parse]
   input_directory = "codeml_files/mlc_files"
@@ -55,6 +57,8 @@ if options[:output_directory]
   output_directory = options[:output_directory]
 elsif options[:g]
   output_directory = "codeml_files/control_files"
+elsif options[:rscript]
+  output_directory = "codeml_files/tree_files"
 elsif options[:parse]
   output_directory = "codeml_files/aa_output"
 elsif options[:convert]
@@ -438,5 +442,29 @@ if options[:trees]
     puts "\nProcessed #{tree_count} trees in total"
     puts warning_message
   end
+end
+
+
+
+# Generate the control file
+if options[:rscript]
+
+  # First, let's get a hash of all sequences vs models
+
+  my_fasta_file = FastaFile.new("#{input_directory}/#{models_list_file}")
+
+  my_fasta_file.sequences_hash.each do |sequence,model|
+
+    # Create a new rscript.R file in memory
+    my_rscript_file = RscriptFile.new
+
+    # Set whatever attributes we need to
+
+    # Set the sequence
+    my_rscript_file.sequence = sequence
+
+    puts my_rscript_file.create("#{output_directory}/#{sequence}.txt")
+  end
+
 end
 

@@ -1,0 +1,7 @@
+library(ape)
+
+testtree <- read.tree("<%= self.sequence %>.txt")
+
+unrooted_tr <- unroot(testtree)
+
+write.tree(unrooted_tr, file="<%= self.sequence %>_unrooted.txt")
