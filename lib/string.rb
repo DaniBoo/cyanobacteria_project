@@ -78,4 +78,15 @@ class String
     true if self.matches_lost_nodes?
   end
 
+  #
+  def get_sequence
+    regex = /^[0-9]+_/
+    self.scan(regex).first[/[0-9]+/]
+  end
+
+  def get_tree_number
+    regex = /.[0-9].txt$/
+    self.scan(regex).last[/[0-9]+/]
+  end
+
 end

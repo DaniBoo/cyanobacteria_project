@@ -25,9 +25,10 @@ OptionParser.new do |opts|
   opts.on('-m', '--match FILE', 'Check a file matches')                   { |v| options[:match] = v }
   opts.on('-w', '--with FILE', '.. with another file')                    { |v| options[:with] = v }
   opts.on('-t', '--trees FILE', 'Tidy a specific tree or "all"')          { |v| options[:trees] = v }
-  opts.on('-s', '--rscript [FILE]', 'Generate rscript.R file')            { |v| options[:rscript_file] = v; options[:rscript] = true }
   opts.on('-r', '--run DIRECTORY', 'Run codeml on a specific directory (within codeml_files/control_files) or "new" or "all"')  { |v| options[:run] = v }
-
+  opts.on('-s', '--rscript [FILE]', 'Generate rinput.R file')            { |v| options[:rscript_file] = v; options[:rscript] = true }
+  opts.on('-u', '--unroot [FILE]', 'Unroot the trees')                    { |v| options[:unroot_tree_file] = v; options[:unroot] = true }
+  
   opts.on( '-h', '--help', 'Display this screen' ) do
     puts opts
   end
@@ -44,8 +45,10 @@ models_list_file = "univ_singlecopy_models.txt"
 # Input Directory
 if options[:input_directory]
   input_directory = options[:input_directory]
-elsif options[:g] || options[:rscript]
+elsif options[:g]
   input_directory = "codeml_files/fasta" #note must be same as for :convert
+elsif  options[:rscript]
+  input_directory = "codeml_files/newick_trees_txt"
 elsif options[:parse]
   input_directory = "codeml_files/mlc_files"
 elsif options[:convert]
@@ -58,7 +61,7 @@ if options[:output_directory]
 elsif options[:g]
   output_directory = "codeml_files/control_files"
 elsif options[:rscript]
-  output_directory = "codeml_files/tree_files"
+  output_directory = "codeml_files/newick_trees_processed"
 elsif options[:parse]
   output_directory = "codeml_files/aa_output"
 elsif options[:convert]
@@ -446,25 +449,51 @@ end
 
 
 
-# Generate the control file
+# Generate the rscript file
 if options[:rscript]
 
-  # First, let's get a hash of all sequences vs models
+  # First, let's get an array of all the tree_files
 
-  my_fasta_file = FastaFile.new("#{input_directory}/#{models_list_file}")
+  my_tree_files = TreeFile.new("#{input_directory}")
 
-  my_fasta_file.sequences_hash.each do |sequence,model|
+  my_tree_files.file_array.sort.each do |sequence_file|
 
-    # Create a new rscript.R file in memory
+    original_sequence_file = sequence_file
+    sequence_file.slice! "#{input_directory}/"
+    
+    sequence = sequence_file.get_sequence
+    tree_number = sequence_file.get_tree_number
+
+    # Create a new rinput.R file in memory
     my_rscript_file = RscriptFile.new
 
     # Set whatever attributes we need to
 
-    # Set the sequence
+    # Set the sequence & tree_number
     my_rscript_file.sequence = sequence
+    my_rscript_file.tree_number = tree_number
 
-    puts my_rscript_file.create("#{output_directory}/#{sequence}.txt")
+    # create the rinput.R file based
+    puts my_rscript_file.create("#{output_directory}/#{sequence}_#{tree_number}/rinput.R")
+
+    # copy the tree - has to be done after the rcript.R copy as this creates the directory
+    pwd = `pwd`.chomp!
+    `cp #{pwd}/#{input_directory}/#{original_sequence_file} #{pwd}/#{output_directory}/#{sequence}_#{tree_number}/#{sequence}_#{tree_number}.txt`
+    puts "copied and renamed #{sequence}_#{tree_number}.txt"
+
   end
 
+end
+
+# Unroot the trees
+if options[:unroot]
+  pwd = `pwd`.chomp!
+  base_directory = "#{pwd}/codeml_files/newick_trees_processed"
+  my_tree_files = TreeFile.new(base_directory)
+
+  my_tree_files.file_array.sort.each do |sequence_file|
+    sequence = sequence_file.scan( /[0-9]+_[0-9]+$/).last
+    puts `cd #{base_directory}/#{sequence} && R --slave < rinput.R`
+  end
 end
 

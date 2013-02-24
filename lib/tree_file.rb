@@ -12,6 +12,10 @@ class TreeFile
     buffer = File.read filename if File.exist? filename
   end
 
+  def read_filenames(directory)
+    Dir["#{directory}/*"]
+  end
+
   # Creates a file and checks if directory exists
   def create_file(path, contents)
     dir = File.dirname(path)
@@ -59,15 +63,6 @@ class TreeFile
 
   # Create a list of files
   def file_array
-    line_array = self.line_array
-    file_array = []
-
-    # Go through each line and create an array of file_name(s)
-    line_array.each do |line|
-      split_line = line.split " "
-      file_name = split_line[0]
-      file_array << file_name
-    end
-    file_array
+    read_filenames(@filename)
   end
 end

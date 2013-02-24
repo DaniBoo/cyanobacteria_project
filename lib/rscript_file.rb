@@ -4,7 +4,7 @@ require "fileutils"
 
 class RscriptFile
 
-  attr_accessor :sequence
+  attr_accessor :sequence, :tree_number
 
   # Reads in a file
   def read(filename)
