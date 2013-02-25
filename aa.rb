@@ -493,7 +493,8 @@ if options[:unroot]
 
   my_tree_files.file_array.sort.each do |sequence_file|
     sequence = sequence_file.scan( /[0-9]+_[0-9]+$/).last
-    puts `cd #{base_directory}/#{sequence} && R --slave < rinput.R`
+    puts `cd #{base_directory}/#{sequence} && R --slave < rinput.R` unless File.exist? "#{base_directory}/#{sequence}/#{sequence}_unrooted.txt"
+    puts "Done: #{sequence}"
   end
 end
 
