@@ -26,7 +26,7 @@ OptionParser.new do |opts|
   opts.on('-w', '--with FILE', '.. with another file')                    { |v| options[:with] = v }
   opts.on('-t', '--trees FILE', 'Tidy a specific tree or "all"')          { |v| options[:trees] = v }
   opts.on('-r', '--run DIRECTORY', 'Run codeml on a specific directory (within codeml_files/control_files) or "new" or "all"')  { |v| options[:run] = v }
-  opts.on('-s', '--rscript [FILE]', 'Generate rinput.R file')            { |v| options[:rscript_file] = v; options[:rscript] = true }
+  opts.on('-s', '--rscript [DIRECTORY]', 'Generate rinput.R file')            { |v| options[:rscript_directory] = v; options[:rscript] = true }
   opts.on('-u', '--unroot [FILE]', 'Unroot the trees')                    { |v| options[:unroot_tree_file] = v; options[:unroot] = true }
   
   opts.on( '-h', '--help', 'Display this screen' ) do
@@ -49,6 +49,7 @@ elsif options[:g]
   input_directory = "codeml_files/fasta" #note must be same as for :convert
 elsif  options[:rscript]
   input_directory = "codeml_files/newick_trees_txt"
+  input_directory = "codeml_files/newick_trees_new" if options[:rscript_directory] == "new"
 elsif options[:parse]
   input_directory = "codeml_files/mlc_files"
 elsif options[:convert]
@@ -62,6 +63,7 @@ elsif options[:g]
   output_directory = "codeml_files/control_files"
 elsif options[:rscript]
   output_directory = "codeml_files/newick_trees_processed"
+  output_directory = "codeml_files/newick_trees_processed_and_cleaned" if options[:rscript_directory] == "new"
 elsif options[:parse]
   output_directory = "codeml_files/aa_output"
 elsif options[:convert]
@@ -361,44 +363,101 @@ if options[:run]
   end 
 end
 
+# if options[:trees]
+#   trees_source_directory = "codeml_files/newick_trees_original/"
+#   trees_target_directory = "codeml_files/newick_trees_new/"
+
+#   # Convert an individual tree file
+#   if options[:trees].downcase != "all"
+    
+#     tree_path = options[:trees]
+
+#     # pull in a tree file
+#     my_tree_file = TreeFile.new("#{trees_source_directory}/#{tree_path}")
+
+#     # Assign the raw contents of the file to a variable  
+#     newick_raw = my_tree_file.raw_output
+
+#     # Create a new Bio::Newick object based on the raw contents of the file
+#     my_newick = Bio::Newick.new newick_raw
+
+#     # Put all nodes in an array
+#     newick_array = my_newick.tree.nodes
+
+#     # Cycle through them
+#     newick_array.each do |node|
+#       # Remove the node if it's a blacklisted one
+#       my_newick.tree.remove_node(node) if node.to_s.is_blacklisted?
+#     end
+#     # Strip all the stuff we need to Convert it all back to Newick format
+#     buffer = my_newick.tree.output_newick.strip_species.strip_bootstrap.gsub /(\s)*(\n)*(\s)*/, ''
+
+#     # Create sequential node numbers beginning with hash
+#     buffer = buffer.replace_node_numbers
+
+#     puts buffer
+
+#     # Write the newick to a file
+#     puts my_tree_file.create_file("#{trees_target_directory}/#{tree_path}",buffer)
+#   else
+
+#     # Or do it for all files in the directory
+#     current_directory = `pwd`.chomp
+#     tree_count = 0
+#     warning_message = ""
+
+#     Dir.glob("#{current_directory}/#{trees_source_directory}**").each do |full_directory| 
+
+#       # pull in a tree file
+#       my_tree_file = TreeFile.new("#{full_directory}")
+
+#       # Assign the raw contents of the file to a variable  
+#       newick_raw = my_tree_file.raw_output
+
+#       # Create a new Bio::Newick object based on the raw contents of the file
+#       my_newick = Bio::Newick.new newick_raw
+
+#       # # Put all nodes in an array
+#       newick_array = my_newick.tree.nodes
+
+#       # Cycle through them
+#       newick_array.each do |node|
+#         # Remove the node if it's a blacklisted one
+#         my_newick.tree.remove_node(node) if node.to_s.is_blacklisted?
+#       end
+#       # Strip all the stuff we need to Convert it all back to Newick format
+#       buffer = my_newick.tree.output_newick.strip_species.strip_bootstrap.gsub /(\s)*(\n)*(\s)*/, ''
+      
+#       # Create sequential node numbers beginning with hash
+#       buffer = buffer.replace_node_numbers
+
+#       # Warning if there are still any lost genes
+#       warning_message = warning_message + "Warning: #{full_directory} matches lost genes\n" if buffer.matches_lost_genes?
+
+#       # Write the newick to a file
+#       trees_file_path = full_directory.gsub("/#{trees_source_directory}","/#{trees_target_directory}")
+
+#       my_tree_file.create_file(trees_file_path,buffer)
+
+#       tree_count += 1
+#       puts "Processing: #{tree_count}"
+      
+#     end
+
+#     puts "\nProcessed #{tree_count} trees in total"
+#     puts warning_message
+#   end
+# end
+
+
+
 if options[:trees]
-  trees_source_directory = "codeml_files/newick_trees_original/"
+  trees_source_directory = "codeml_files/newick_trees_txt/"
   trees_target_directory = "codeml_files/newick_trees_new/"
 
   # Convert an individual tree file
-  if options[:trees].downcase != "all"
+  if options[:trees].downcase == "all"
     
-    tree_path = options[:trees]
-
-    # pull in a tree file
-    my_tree_file = TreeFile.new("#{trees_source_directory}/#{tree_path}")
-
-    # Assign the raw contents of the file to a variable  
-    newick_raw = my_tree_file.raw_output
-
-    # Create a new Bio::Newick object based on the raw contents of the file
-    my_newick = Bio::Newick.new newick_raw
-
-    # Put all nodes in an array
-    newick_array = my_newick.tree.nodes
-
-    # Cycle through them
-    newick_array.each do |node|
-      # Remove the node if it's a blacklisted one
-      my_newick.tree.remove_node(node) if node.to_s.is_blacklisted?
-    end
-    # Strip all the stuff we need to Convert it all back to Newick format
-    buffer = my_newick.tree.output_newick.strip_species.strip_bootstrap.gsub /(\s)*(\n)*(\s)*/, ''
-
-    # Create sequential node numbers beginning with hash
-    buffer = buffer.replace_node_numbers
-
-    puts buffer
-
-    # Write the newick to a file
-    puts my_tree_file.create_file("#{trees_target_directory}/#{tree_path}",buffer)
-  else
-
     # Or do it for all files in the directory
     current_directory = `pwd`.chomp
     tree_count = 0
@@ -444,6 +503,96 @@ if options[:trees]
 
     puts "\nProcessed #{tree_count} trees in total"
     puts warning_message
+
+  elsif options[:trees].downcase == "after_r"
+
+    trees_source_directory = "codeml_files/newick_trees_processed/"
+    trees_target_directory = "codeml_files/newick_trees_after_r/"
+
+    puts "hi"
+    current_directory = `pwd`.chomp
+    tree_count = 0
+    warning_message = ""
+
+    Dir.glob("#{current_directory}/#{trees_source_directory}**").each do |full_directory| 
+
+      
+
+      sequence = full_directory.scan( /[0-9]+_[0-9]+$/).last
+
+      full_directory = "#{full_directory}/#{sequence}_unrooted.txt"
+
+
+      # pull in a tree file
+      my_tree_file = TreeFile.new("#{full_directory}")
+
+      # Assign the raw contents of the file to a variable  
+      newick_raw = my_tree_file.raw_output
+
+      # Create a new Bio::Newick object based on the raw contents of the file
+      my_newick = Bio::Newick.new newick_raw
+
+      # # Put all nodes in an array
+      newick_array = my_newick.tree.nodes
+
+      # Cycle through them
+      newick_array.each do |node|
+        # Remove the node if it's a blacklisted one
+        my_newick.tree.remove_node(node) if node.to_s.is_blacklisted?
+      end
+      # Strip all the stuff we need to Convert it all back to Newick format
+      buffer = my_newick.tree.output_newick.strip_species.strip_bootstrap.gsub /(\s)*(\n)*(\s)*/, ''
+      
+      # Create sequential node numbers beginning with hash
+      buffer = buffer.replace_node_numbers
+
+      # Warning if there are still any lost genes
+      warning_message = warning_message + "Warning: #{full_directory} matches lost genes\n" if buffer.matches_lost_genes?
+
+      # Write the newick to a file
+      trees_file_path = full_directory.gsub("/#{trees_source_directory}","/#{trees_target_directory}")
+
+      my_tree_file.create_file(trees_file_path,buffer)
+
+      tree_count += 1
+      puts "Processing: #{tree_count}"
+      
+    end
+
+    puts "\nProcessed #{tree_count} trees in total"
+    puts warning_message
+
+  else
+
+    tree_path = options[:trees]
+
+    # pull in a tree file
+    my_tree_file = TreeFile.new("#{trees_source_directory}/#{tree_path}")
+
+    # Assign the raw contents of the file to a variable  
+    newick_raw = my_tree_file.raw_output
+
+    # Create a new Bio::Newick object based on the raw contents of the file
+    my_newick = Bio::Newick.new newick_raw
+
+    # Put all nodes in an array
+    newick_array = my_newick.tree.nodes
+
+    # Cycle through them
+    newick_array.each do |node|
+      # Remove the node if it's a blacklisted one
+      my_newick.tree.remove_node(node) if node.to_s.is_blacklisted?
+    end
+    # Strip all the stuff we need to Convert it all back to Newick format
+    buffer = my_newick.tree.output_newick.strip_species.strip_bootstrap.gsub /(\s)*(\n)*(\s)*/, ''
+
+    # Create sequential node numbers beginning with hash
+    buffer = buffer.replace_node_numbers
+
+    puts buffer
+
+    # Write the newick to a file
+    puts my_tree_file.create_file("#{trees_target_directory}/#{tree_path}",buffer)
   end
 end
 
@@ -489,6 +638,7 @@ end
 if options[:unroot]
   pwd = `pwd`.chomp!
   base_directory = "#{pwd}/codeml_files/newick_trees_processed"
+  base_directory = "#{pwd}/codeml_files/#{options[:unroot_tree_file]}" if options[:unroot_tree_file]
   my_tree_files = TreeFile.new(base_directory)
 
   my_tree_files.file_array.sort.each do |sequence_file|
