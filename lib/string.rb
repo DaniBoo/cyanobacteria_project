@@ -40,11 +40,12 @@ class String
     # Now go through each key,value pair in the hash
     node_number_hash.each do |key,value|
       # Do a simple replace on of the key with the value in the original string
-      self.sub!(key,value)
+      # replace the key with an empty string
+      self.sub!(key,'')
     end
 
     # Return the modified string
-    self
+    self.gsub(':NA','')
   end
 
   # Replace node labels with #X (where X is node number)

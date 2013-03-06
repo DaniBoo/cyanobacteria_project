@@ -1,4 +1,4 @@
-# Load in the classes we've created
+  # Load in the classes we've created
 load "lib/string.rb"
 load "lib/codeml_results.rb"
 load "lib/control_file.rb"
@@ -144,15 +144,26 @@ if options[:g]
     # Set the sequence
     my_control_file.sequence = sequence
 
-    # First create the control file for G clock
-    # 1 for G Clock
-    my_control_file.clock = 1
-    puts my_control_file.create("#{output_directory}/#{sequence}_gclock/#{control_filename}")
+    # Find any directories in newick_trees_after_r which start with the sequence number
+    # This allows us to deal with sequences with more than 1 tree that fit
+    # Get the current directory
+    current_directory = `pwd`.chomp
+    # Cycle through all the directories
+    Dir.glob("#{current_directory}/codeml_files/newick_trees_after_r/#{sequence}_*").each do|full_directory|
+      sequence_and_version = full_directory.sub("#{current_directory}/codeml_files/newick_trees_after_r/",'')
+      
+      # First create the control file for G clock
+      # 1 for G Clock
+      my_control_file.clock = 1
+      puts my_control_file.create("#{output_directory}/#{sequence_and_version}_gclock/#{control_filename}")
 
-    # Then create the control file for no clock
-    # 0 for no Clock
-    my_control_file.clock = 0
-    puts my_control_file.create("#{output_directory}/#{sequence}_nonclock/#{control_filename}")
+      # Then create the control file for no clock
+      # 0 for no Clock
+      my_control_file.clock = 0
+      puts my_control_file.create("#{output_directory}/#{sequence_and_version}_nonclock/#{control_filename}")
+    end
+
+
   end
 
 end
@@ -208,8 +219,9 @@ if options[:parse]
 end
 
 # Convert the fasta files to aa files / and rename and move trees
-# Note: MUST run -g first at present (will try to fix later)
+# Note: MUST run -g first at present
 if options[:convert]
+
 
   # Do FASTA files to AA first
   my_fasta_file = FastaFile.new("#{input_directory}/#{models_list_file}")
@@ -222,33 +234,53 @@ if options[:convert]
     # Copying the file to 2 places
     source = "#{input_directory}/#{file}"
 
-    # destination = "#{output_directory}/#{sequence_file}"
-    gclock_destination = "codeml_files/control_files/#{sequence_number}_gclock/#{sequence_file}"
-    nonclock_destination = "codeml_files/control_files/#{sequence_number}_nonclock/#{sequence_file}"
+    # Find any directories in newick_trees_after_r which start with the sequence number
+    # This allows us to deal with sequences with more than 1 tree that fit
+    # Get the current directory
+    current_directory = `pwd`.chomp
+    # Cycle through all the directories
+    Dir.glob("#{current_directory}/codeml_files/newick_trees_after_r/#{sequence_number}_*").each do|full_directory|
 
-    # http://ruby-doc.org/stdlib-1.9.3/libdoc/fileutils/rdoc/FileUtils.html
-    # Check if the file exists first
-    if File.exist? source
-      # Copy to all 2 destinations
-      # FileUtils.cp(source, destination) # Not going to use for now
-      FileUtils.cp(source, gclock_destination)
-      FileUtils.cp(source, nonclock_destination)
-    else
-      error_file = "codeml_files/errors/aa_errors.csv"
-      my_fasta_file.add_to_errors_file(error_file,source)
-    end
+      sequence_and_version = full_directory.sub("#{current_directory}/codeml_files/newick_trees_after_r/",'')
+      
+      # destination = "#{output_directory}/#{sequence_file}"
+      gclock_destination = "codeml_files/control_files/#{sequence_and_version}_gclock/#{sequence_file}"
+      nonclock_destination = "codeml_files/control_files/#{sequence_and_version}_nonclock/#{sequence_file}"
 
-    trees_source = "codeml_files/trees/#{sequence_number}_MAFFT_ALIGNED.phy_phyml_tree.txt"
-    trees_gclock_destination = "codeml_files/control_files/#{sequence_number}_gclock/#{trees_file}"
-    trees_nonclock_destination = "codeml_files/control_files/#{sequence_number}_nonclock/#{trees_file}"
+      # http://ruby-doc.org/stdlib-1.9.3/libdoc/fileutils/rdoc/FileUtils.html
+      # Check if the file exists first
+      if File.exist? source
+        # Copy to all 2 destinations
+        # FileUtils.cp(source, destination) # Not going to use for now
+        FileUtils.cp(source, gclock_destination)
+        puts "Copied: #{gclock_destination}"
+        FileUtils.cp(source, nonclock_destination)
+        puts "Copied: #{nonclock_destination}"
+      else
+        puts "Can't find: #{source}"
+        error_file = "codeml_files/errors/aa_errors.csv"
+        my_fasta_file.add_to_errors_file(error_file,source)
+      end
 
-    if File.exist? trees_source
-      # Copy to all 2 destinations
-      FileUtils.cp(trees_source, trees_gclock_destination)
-      FileUtils.cp(trees_source, trees_nonclock_destination)
-    else
-      error_file = "codeml_files/errors/trees_errors.csv"
-      my_fasta_file.add_to_errors_file(error_file,trees_source)
+
+
+      # Now copy the trees
+      trees_source = "#{current_directory}/codeml_files/newick_trees_after_r/#{sequence_and_version}/#{sequence_and_version}_unrooted.txt"
+
+      trees_gclock_destination = "codeml_files/control_files/#{sequence_and_version}_gclock/#{trees_file}"
+      trees_nonclock_destination = "codeml_files/control_files/#{sequence_and_version}_nonclock/#{trees_file}"
+
+      if File.exist? trees_source
+        # Copy to all 2 destinations
+        FileUtils.cp(trees_source, trees_gclock_destination)
+        puts "Copied: #{trees_gclock_destination}"
+        FileUtils.cp(trees_source, trees_nonclock_destination)
+        puts "Copied: #{trees_nonclock_destination}"
+      else
+        puts "Can't find: #{trees_source}"
+        error_file = "codeml_files/errors/trees_errors.csv"
+        my_fasta_file.add_to_errors_file(error_file,trees_source)
+      end     
     end
 
   end
@@ -452,7 +484,7 @@ end
 
 
 if options[:trees]
-  trees_source_directory = "codeml_files/newick_trees_txt/"
+  trees_source_directory = "codeml_files/newick_trees_processed/"
   trees_target_directory = "codeml_files/newick_trees_new/"
 
   # Convert an individual tree file
@@ -488,6 +520,9 @@ if options[:trees]
       # Create sequential node numbers beginning with hash
       buffer = buffer.replace_node_numbers
 
+      puts buffer
+      puts "\n\n\n"
+
       # Warning if there are still any lost genes
       warning_message = warning_message + "Warning: #{full_directory} matches lost genes\n" if buffer.matches_lost_genes?
 
@@ -509,7 +544,7 @@ if options[:trees]
     trees_source_directory = "codeml_files/newick_trees_processed/"
     trees_target_directory = "codeml_files/newick_trees_after_r/"
 
-    puts "hi"
+ 
     current_directory = `pwd`.chomp
     tree_count = 0
     warning_message = ""
