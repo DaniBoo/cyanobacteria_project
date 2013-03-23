@@ -40,12 +40,42 @@ class String
     # Now go through each key,value pair in the hash
     node_number_hash.each do |key,value|
       # Do a simple replace on of the key with the value in the original string
-      # replace the key with an empty string
+      self.sub!(key,value)
+    end
+
+    # Return the modified string
+    self
+  end
+
+
+  # Remove node labels
+  def remove_node_numbers
+    regex = /[n|r][0-9]+/
+
+    # Start counting nodes
+    node_count = 1
+
+    # Empty hash to link node numbers to node count
+    node_number_hash = {}
+
+    # Go through each match of the regex
+    self.scan regex do |node_number|
+
+      # Add the node number and count to the hash
+      node_number_hash[node_number] = "##{node_count}"
+
+      # Increment the count by one
+      node_count += 1
+    end
+
+    # Now go through each key,value pair in the hash
+    node_number_hash.each do |key,value|
+      # Do a simple replace on of the key with a zero length string
       self.sub!(key,'')
     end
 
     # Return the modified string
-    self.gsub(':NA','')
+    self
   end
 
   # Replace node labels with #X (where X is node number)

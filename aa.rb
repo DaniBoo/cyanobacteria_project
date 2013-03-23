@@ -28,6 +28,9 @@ OptionParser.new do |opts|
   opts.on('-r', '--run DIRECTORY', 'Run codeml on a specific directory (within codeml_files/control_files) or "new" or "all"')  { |v| options[:run] = v }
   opts.on('-s', '--rscript [DIRECTORY]', 'Generate rinput.R file')            { |v| options[:rscript_directory] = v; options[:rscript] = true }
   opts.on('-u', '--unroot [FILE]', 'Unroot the trees')                    { |v| options[:unroot_tree_file] = v; options[:unroot] = true }
+  opts.on('-o', '--overwrite', 'Overwrite the trees')                    { |v| options[:overwrite] = true }
+  opts.on('-x', '--expunge', 'eXpunge all done files')                    { |v| options[:x] = true }
+  opts.on('-k', '--kleanse', 'c/kleanse older directories without the version number')                    { |v| options[:k] = true }
   
   opts.on( '-h', '--help', 'Display this screen' ) do
     puts opts
@@ -682,4 +685,88 @@ if options[:unroot]
     puts "Done: #{sequence}"
   end
 end
+
+# Overwrite the global clock trees with rooted trees
+if options[:overwrite]
+
+  tree_count = 0;
+
+  # Make sure that UNROOTED trees are being used for NON-CLOCK and 
+  # ROOTED trees are being used for the GLOBAL CLOCK.
+  pwd = `pwd`.chomp!
+  base_directory = "#{pwd}/codeml_files/newick_trees_original"
+  my_tree_files = TreeFile.new(base_directory)
+  my_tree_files.file_array.sort.each do |sequence_file|
+    # 10001_unrooted_bs.tre.outtree.tree.rearrange.0.nwk.rooting.0.nwk
+    sequence = sequence_file.scan(/[0-9]+_unrooted/).last.to_s.scan(/[0-9]+/).last
+    number = sequence_file.scan(/[0-9]+.nwk$/).last.to_s.scan(/[0-9]+/).last
+    next if sequence_file.scan(/.nwk$/).size <= 0
+    trees_file_path = "#{pwd}/codeml_files/control_files/#{sequence}_#{number}_gclock/#{sequence}.trees"
+    
+
+    full_directory = sequence_file
+
+    # pull in a tree file
+    my_tree_file = TreeFile.new("#{full_directory}")
+
+    # Assign the raw contents of the file to a variable  
+    newick_raw = my_tree_file.raw_output
+
+    # Create a new Bio::Newick object based on the raw contents of the file
+    my_newick = Bio::Newick.new newick_raw
+
+    # # Put all nodes in an array
+    newick_array = my_newick.tree.nodes
+
+    # Cycle through them
+    newick_array.each do |node|
+      # Remove the node if it's a blacklisted one
+      my_newick.tree.remove_node(node) if node.to_s.is_blacklisted?
+    end
+    # Strip all the stuff we need to Convert it all back to Newick format
+    buffer = my_newick.tree.output_newick.strip_species.strip_bootstrap.gsub /(\s)*(\n)*(\s)*/, ''
+    
+    # Create sequential node numbers beginning with hash
+    buffer = buffer.remove_node_numbers
+
+    # puts buffer
+
+    # Warning if there are still any lost genes
+    warning_message = warning_message + "Warning: #{full_directory} matches lost genes\n" if buffer.matches_lost_genes?
+
+    # Write the newick to a file
+    #trees_file_path = full_directory.gsub("/#{trees_source_directory}","/#{trees_target_directory}")
+
+    my_tree_file.create_file(trees_file_path,buffer)
+    
+    tree_count += 1
+    puts "Processing: #{tree_count}"
+
+  end
+end
+
+
+# Clean out (eXpunge) any done files (so we can re-do)
+if options[:x]
+
+  pwd = `pwd`.chomp!
+  Dir.glob("codeml_files/control_files/**/done").each do |done_file|
+
+    puts `rm #{pwd}/#{done_file}`
+  end
+end
+
+# Cleanse (kleanse) out old directories before we had the version number
+# Eg. with a pattern of XXX_global .. etc
+if options[:k]
+
+  pwd = `pwd`.chomp!
+  Dir.glob("codeml_files/control_files/**").each do |folder|
+
+    regex = /\/[0-9]+_[a-z]/
+    puts `rm -rf #{pwd}/#{folder}` if folder =~ regex
+
+  end
+end
+
 

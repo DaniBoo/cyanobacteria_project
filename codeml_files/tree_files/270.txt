@@ -1,0 +1,7 @@
+library(ape)
+
+testtree <- read.tree("270.txt")
+
+unrooted_tr <- unroot(testtree)
+
+write.tree(unrooted_tr, file="270_unrooted.txt")
